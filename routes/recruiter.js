@@ -10,6 +10,8 @@ const router = express.Router();
 // Ensure only recruiters can access these routes
 router.use(authMiddleware(["recruiter"]));
 
+
+//---------------Dashboard page------------------//
 // ✅ Recruiter Dashboard (GET all notifications + interviews)
 router.get("/", async (req, res) => {
   try {
@@ -76,6 +78,8 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+//---------------Create Interview pages--------------------//
 // ✅ Fetch candidates for create-interview page
 router.get("/create-interview", async (req, res) => {
   try {
@@ -130,6 +134,7 @@ router.post("/create-interview", async (req, res) => {
   }
 });
 
+//---------------View interview pages------------------//
 // ✅ Get all interviews for this recruiter
 router.get("/interviews", async (req, res) => {
   try {
@@ -145,6 +150,8 @@ router.get("/interviews", async (req, res) => {
   }
 });
 
+
+//----------------Edit interview pages------------------//
 // ✅ Get a single interview
 router.get("/interview/:id", async (req, res) => {
   try {
@@ -231,6 +238,8 @@ router.post("/interview/:id/edit", async (req, res) => {
   }
 });
 
+
+//---------------view results pages------------------//
 // ✅ View AI analysis results
 router.get("/interview-results", async (req, res) => {
   try {

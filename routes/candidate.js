@@ -15,6 +15,7 @@ const router = express.Router();
 // Ensure only candidates can access these routes
 router.use(authMiddleware(["candidate"]));
 
+//---------------dashbooard page------------------//
 // ✅ Candidate Dashboard - Get notifications and interviews
 router.get("/", async (req, res) => {
   try {
@@ -61,6 +62,8 @@ router.delete("/notifications/:id/delete", async (req, res) => {
   }
 });
 
+
+//---------------profile pages------------------//
 // ✅ Get Candidate Profile
 router.get("/profile", async (req, res) => {
   try {
@@ -71,6 +74,18 @@ router.get("/profile", async (req, res) => {
     res.status(500).json({ message: "Error loading profile" });
   }
 });
+
+// ✅ Update Profile
+router.post("/profile/edit", async (req, res) => {
+  const { name, email } = req.body;
+  try {
+    await User.findByIdAndUpdate(req.user.id, { name, email });
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating profile" });
+  }
+});
+
 
 // ✅ Update Candidate Password
 router.post("/profile/edit-password", async (req, res) => {
@@ -96,6 +111,9 @@ router.post("/profile/edit-password", async (req, res) => {
   }
 });
 
+
+
+//---------------answer pages------------------//
 // ✅ Get Assigned Interviews
 router.get("/interviews", async (req, res) => {
   try {
@@ -222,6 +240,8 @@ router.post("/interview/:id/submit", upload.array("fileAnswers", 5), async (req,
   }
 });
 
+
+//---------------faq pages------------------//
 // ✅ Get FAQ Details
 router.get("/faq", (req, res) => {
   res.json({ message: "FAQ Page Loaded" });

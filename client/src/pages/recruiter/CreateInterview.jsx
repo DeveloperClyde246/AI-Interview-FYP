@@ -139,7 +139,7 @@ const CreateInterview = () => {
                   handleQuestionChange(index, "recordingRequired", e.target.checked)
                 }
               />
-              Requires Recording
+              Requires Answer
             </label>
           </div>
         ))}
