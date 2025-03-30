@@ -87,6 +87,12 @@ router.get("/logout", (req, res) => {
   res.json({ message: "Logged out successfully" });
 });
 
+router.post("/logout", (req, res) => {
+  res.clearCookie("token"); // Clear the authentication token cookie
+  res.status(200).json({ message: "Logout successful" });
+});
+
+
 module.exports = router;
   
   // The  /me  route is used by the frontend to check if a user is logged in. It reads the JWT token from the cookie, verifies it, and sends back the username and role. 

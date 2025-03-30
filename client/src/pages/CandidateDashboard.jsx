@@ -31,13 +31,21 @@ const CandidateDashboard = () => {
   // ✅ Handle Logout
   const handleLogout = async () => {
     try {
-      await axios.get("http://localhost:5000/auth/logout", {
-        withCredentials: true,
-      });
-      navigate("/login");
-    } catch (error) {
-      console.error("❌ Error logging out:", error.message);
-      setError("Error logging out.");
+      const res = await axios.get(
+        "http://localhost:5000/auth/logout",
+        {},
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        alert("Logout successful!");
+        navigate("/login"); // ✅ Redirect to login after successful logout
+      } else {
+        alert("Logout failed. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error during logout:", err);
+      alert("Error logging out. Please try again.");
     }
   };
 
@@ -54,7 +62,7 @@ const CandidateDashboard = () => {
         ) : (
           notifications.map((notification) => (
             <li key={notification._id}>
-              <Link to={`/candidate/notifications/${notification._id}`}>
+              <Link to={`notifications/${notification._id}`}>
                 {notification.message} -{" "}
                 {new Date(notification.createdAt).toLocaleString()}
               </Link>{" "}

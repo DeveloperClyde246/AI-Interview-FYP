@@ -15,12 +15,14 @@ import NotificationDetails from "./pages/NotificationDetails";
 import CreateInterview from "./pages/CreateInterview";
 import CandidateFAQ from "./pages/CandidateFAQ";
 import CandidateDashboard from "./pages/CandidateDashboard";
+import CandidateInterviews from "./pages/CandidateInterviews"; 
+import CandidateNotificationDetails from "./pages/CandidateNotificationDetails";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        
+        {/* auth */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
@@ -33,12 +35,17 @@ function App() {
         <Route path="/recruiter/interviews" element={<RecruiterInterviews />} />
         <Route path="/recruiter/interview/:id" element={<RecruiterInterviewDetails />} />
         <Route path="/recruiter/interview-results" element={<RecruiterInterviewResults />} />
-        <Route path="/notifications/:id" element={<NotificationDetails />} />
+        <Route path="/recruiter/notifications/:id" element={<NotificationDetails />} />
         <Route path="/recruiter/create-interview" element={<CreateInterview />} />
 
         {/* candidate */}
         <Route path="/candidate/faq" element={<CandidateFAQ />} />
         <Route path="/candidate" element={<CandidateDashboard />} />
+        <Route path="/candidate/interviews" element={<CandidateInterviews />} /> 
+        <Route path="/candidate/notifications/:id" element={<CandidateNotificationDetails />} />
+        
+
+        
 
       </Routes>
     </BrowserRouter>

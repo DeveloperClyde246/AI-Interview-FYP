@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const RecruiterDashboard = () => {
@@ -9,6 +9,8 @@ const RecruiterDashboard = () => {
     interviews: [],
   });
   const [error, setError] = useState("");
+
+  const navigate = useNavigate(); // ✅ Add useNavigate for redirection
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -28,6 +30,27 @@ const RecruiterDashboard = () => {
 
   const { username, notifications, interviews } = data;
 
+  // ✅ Handle logout and redirect to login
+  const handleLogout = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:5000/auth/logout",
+        {},
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        alert("Logout successful!");
+        navigate("/login"); // ✅ Redirect to login after successful logout
+      } else {
+        alert("Logout failed. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error during logout:", err);
+      alert("Error logging out. Please try again.");
+    }
+  };
+
   return (
     <div>
       <h2>Recruiter Dashboard</h2>
@@ -40,7 +63,7 @@ const RecruiterDashboard = () => {
         ) : (
           notifications.map((n) => (
             <li key={n._id}>
-              <Link to={`/notifications/${n._id}`}>
+              <Link to={`notifications/${n._id}`}>
                 {n.message} - {n.status === "unread" ? "🔔" : "✅"}
               </Link>
             </li>
@@ -91,7 +114,8 @@ const RecruiterDashboard = () => {
       </table>
 
       <br />
-      <a href="http://localhost:5000/auth/logout">Logout</a>
+      {/* ✅ Replaced <a> with button to trigger handleLogout */}
+      <button onClick={handleLogout}>Logout</button>
       {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
