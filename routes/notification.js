@@ -45,6 +45,8 @@ const checkUpcomingInterviews = async () => {
 
 setInterval(checkUpcomingInterviews, 24 * 60 * 60 * 1000);
 
+
+
 // ✅ Get notification details
 router.get("/:id", async (req, res) => {
   try {
@@ -58,6 +60,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+
+
 // ✅ Delete notification
 router.post("/:id/delete", async (req, res) => {
   try {
@@ -66,7 +70,7 @@ router.post("/:id/delete", async (req, res) => {
       return res.status(404).json({ message: "Notification not found" });
     }
 
-    // ✅ Extract interview title from notification message
+    // Extract interview title from notification message
     const interviewTitleMatch = notification.message.match(/"([^"]+)"/);
     if (!interviewTitleMatch) {
       return res.status(400).json({ message: "Invalid notification format" });
@@ -74,7 +78,7 @@ router.post("/:id/delete", async (req, res) => {
 
     const interviewTitle = interviewTitleMatch[1];
 
-    // ✅ Find the corresponding interview by title
+    // Find the corresponding interview by title
     const interview = await Interview.findOne({ title: interviewTitle });
     if (!interview) {
       // ✅ Allow deleting notification if interview is not found
@@ -82,7 +86,7 @@ router.post("/:id/delete", async (req, res) => {
       return res.json({ message: "Notification deleted successfully" });
     }
 
-    // ✅ Check if interview is within 24 hours
+    // Check if interview is within 24 hours
     const now = new Date();
     const interviewDate = new Date(interview.scheduled_date);
     const hoursDifference = (interviewDate - now) / (1000 * 60 * 60);
@@ -91,7 +95,7 @@ router.post("/:id/delete", async (req, res) => {
       return res.status(403).json({ message: "Cannot delete notifications for interviews happening within 24 hours." });
     }
 
-    // ✅ Delete the notification if the interview is not within 24 hours
+    // Delete the notification if the interview is not within 24 hours
     await Notification.findByIdAndDelete(req.params.id);
     res.json({ message: "Notification deleted successfully" });
   } catch (error) {

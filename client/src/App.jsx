@@ -1,22 +1,24 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 //auth
 import Users from "./pages/Users";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
 //admin
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 //recruiter
-import RecruiterDashboard from "./pages/RecruiterDashboard";
-import RecruiterInterviews from "./pages/RecruiterInterviews";
-import RecruiterInterviewDetails from "./pages/RecruiterInterviewDetails";
-import RecruiterInterviewResults from "./pages/RecruiterInterviewResults";
-import NotificationDetails from "./pages/NotificationDetails";
+import RecruiterDashboard from "./pages/recruiter/RecruiterDashboard";
+import RecruiterInterviews from "./pages/recruiter/RecruiterInterviews";
+import RecruiterInterviewDetails from "./pages/recruiter/RecruiterInterviewDetails";
+import RecruiterInterviewResults from "./pages/recruiter/RecruiterInterviewResults";
+import NotificationDetails from "./pages/recruiter/NotificationDetails";
 //candidate
-import CreateInterview from "./pages/CreateInterview";
-import CandidateFAQ from "./pages/CandidateFAQ";
-import CandidateDashboard from "./pages/CandidateDashboard";
-import CandidateInterviews from "./pages/CandidateInterviews"; 
-import CandidateNotificationDetails from "./pages/CandidateNotificationDetails";
+import CreateInterview from "./pages/recruiter/CreateInterview";
+import CandidateFAQ from "./pages/candidate/CandidateFAQ";
+import CandidateDashboard from "./pages/candidate/CandidateDashboard";
+import CandidateInterviews from "./pages/candidate/CandidateInterviews"; 
+import CandidateNotificationDetails from "./pages/candidate/CandidateNotificationDetails";
+import CandidateAnswer from "./pages/candidate/CandidateAnswer";
+import CandidateProfile from "./pages/candidate/CandidateProfile";
 
 function App() {
   return (
@@ -43,8 +45,8 @@ function App() {
         <Route path="/candidate" element={<CandidateDashboard />} />
         <Route path="/candidate/interviews" element={<CandidateInterviews />} /> 
         <Route path="/candidate/notifications/:id" element={<CandidateNotificationDetails />} />
-        
-
+        <Route path="/candidate/interview/:id" element={<CandidateAnswer />} />
+        <Route path="/candidate/profile" element={<CandidateProfile />} />
         
 
       </Routes>
