@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 //auth
-import Users from "./pages/Users";
+// import Users from "./pages/Users";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 //admin
@@ -29,7 +29,6 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         {/* admin */}
-        <Route path="/admin/users" element={<Users />} />
         <Route path="/admin" element={<AdminDashboard />} />
 
         {/* recruiter */}
