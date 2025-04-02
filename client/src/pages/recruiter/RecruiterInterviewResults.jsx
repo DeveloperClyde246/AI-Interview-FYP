@@ -79,6 +79,29 @@ const RecruiterInterviewResults = () => {
                             </li>
                           ))}
                         </ul>
+
+                        <button
+                          style={{ marginTop: "5px", color: "red" }}
+                          onClick={async () => {
+                            if (window.confirm("Are you sure you want to delete this response?")) {
+                              try {
+                                await axios.post(
+                                  `http://localhost:5000/recruiter/interview/${interview._id}/delete-response`,
+                                  { candidateId: response.candidate?._id },
+                                  { withCredentials: true }
+                                );
+                                alert("Response deleted.");
+                                fetchResults(); // Refresh the list
+                              } catch (err) {
+                                alert("Error deleting response.");
+                                console.error(err);
+                              }
+                            }
+                          }}
+                        >
+                          Delete Response
+                        </button>
+                        
                       </td>
                     </tr>
                   ))}

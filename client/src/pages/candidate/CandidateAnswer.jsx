@@ -53,6 +53,8 @@ const CandidateAnswer = () => {
       .then((stream) => {
         const videoPreview = document.getElementById(`video-preview-${index}`);
         videoPreview.srcObject = stream;
+        videoPreview.muted = true; // ensures no feedback noise
+        videoPreview.play(); // Start playing live stream  
         mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
         recordedBlobs = [];
 
@@ -183,7 +185,7 @@ const CandidateAnswer = () => {
                 <button type="button" onClick={() => stopVideoRecording(index)}>
                   Stop Recording
                 </button>
-                <video id={`video-preview-${index}`} controls></video>
+                <video id={`video-preview-${index}`} controls autoPlay muted></video>
                 <input type="hidden" name={`answers[${index}]`} value={recordedVideos[index] || ""} />
               </div>
             )}

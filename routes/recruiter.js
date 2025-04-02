@@ -256,4 +256,22 @@ router.get("/interview-results", async (req, res) => {
   }
 });
 
+// ✅ Delete candidate response for an interview
+router.post("/interview/:interviewId/delete-response", async (req, res) => {
+  try {
+    const { candidateId } = req.body;
+
+    await Interview.findByIdAndUpdate(req.params.interviewId, {
+      $pull: { responses: { candidate: candidateId } },
+    });
+
+    res.json({ message: "Response deleted successfully" });
+  } catch (error) {
+    console.error("❌ Error deleting response:", error.message);
+    res.status(500).json({ message: "Error deleting response" });
+  }
+});
+
+
+
 module.exports = router;
