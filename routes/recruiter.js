@@ -15,6 +15,7 @@ router.use(authMiddleware(["recruiter"]));
 // ✅ Recruiter Dashboard (GET all notifications + interviews)
 router.get("/", async (req, res) => {
   try {
+    console.log("📥 Recruiter dashboard accessed");
     const recruiterId = req.user.id;
 
     const now = new Date();
@@ -26,7 +27,8 @@ router.get("/", async (req, res) => {
     }).populate("candidates", "_id");
 
     for (const interview of upcomingInterviews) {
-      const recruiterMsg = `Reminder: You have an interview titled "${interview.title}" scheduled soon.`;
+      const formattedDate = new Date(interview.scheduled_date).toLocaleString();
+      const recruiterMsg = `You have an interview titled "${interview.title}" scheduled for ${formattedDate}.`;
 
       const recruiterNotification = await Notification.findOne({
         userId: recruiterId,
@@ -42,7 +44,7 @@ router.get("/", async (req, res) => {
       }
 
       for (const candidate of interview.candidates) {
-        const candidateMsg = `Reminder: You have an interview titled "${interview.title}" scheduled soon.`;
+        const candidateMsg = `You have an interview titled "${interview.title}" scheduled for ${formattedDate}.`;
 
         const existing = await Notification.findOne({
           userId: candidate._id,

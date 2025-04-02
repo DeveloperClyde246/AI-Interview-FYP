@@ -51,6 +51,15 @@ const CandidateDashboard = () => {
 
   return (
     <div>
+      <nav style={styles.navbar}>
+        <Link to="/candidate" style={styles.navLink}>Dashboard</Link>
+        <Link to="/candidate/interviews" style={styles.navLink}>Interviews</Link>
+        <Link to="/candidate/faq" style={styles.navLink}>FAQ</Link>
+        <Link to="/candidate/profile" style={styles.navLink}>Profile</Link>
+        <button onClick={handleLogout} style={styles.logoutButton}>Logout</button>
+      </nav>
+
+
       <h2>Candidate Dashboard</h2>
       <p>Welcome, {username}!</p>
 
@@ -111,5 +120,33 @@ const CandidateDashboard = () => {
     </div>
   );
 };
+
+
+const styles = {
+  navbar: {
+    display: "flex",
+    justifyContent: "space-around",
+    alignItems: "center",
+    padding: "10px 20px",
+    backgroundColor: "#f0f0f0",
+    borderBottom: "1px solid #ccc",
+    marginBottom: "20px",
+  },
+  navLink: {
+    textDecoration: "none",
+    color: "#007bff",
+    fontWeight: "bold",
+  },
+  logoutButton: {
+    backgroundColor: "#dc3545",
+    color: "#fff",
+    border: "none",
+    padding: "8px 12px",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
+};
+
+
 
 export default CandidateDashboard;

@@ -82,7 +82,7 @@ const CandidateNotificationDetails = () => {
         <strong>Message:</strong> {notification.message}
       </p>
       <p>
-        <strong>Created At:</strong>{" "}
+        <strong>Notification created At:</strong>{" "}
         {new Date(notification.createdAt).toLocaleString()}
       </p>
 

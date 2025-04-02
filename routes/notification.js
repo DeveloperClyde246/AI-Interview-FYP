@@ -5,45 +5,45 @@ const mongoose = require("mongoose");
 
 const router = express.Router();
 
-// ✅ Check and add notifications for interviews happening tomorrow
-const checkUpcomingInterviews = async () => {
-  try {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
+// // ✅ Check and add notifications for interviews happening tomorrow
+// const checkUpcomingInterviews = async () => {
+//   try {
+//     const tomorrow = new Date();
+//     tomorrow.setDate(tomorrow.getDate() + 1);
+//     tomorrow.setHours(0, 0, 0, 0);
 
-    const nextDay = new Date(tomorrow);
-    nextDay.setHours(23, 59, 59, 999);
+//     const nextDay = new Date(tomorrow);
+//     nextDay.setHours(23, 59, 59, 999);
 
-    const upcomingInterviews = await Interview.find({
-      scheduled_date: { $gte: tomorrow, $lte: nextDay },
-    }).populate("recruiterId", "name email");
+//     const upcomingInterviews = await Interview.find({
+//       scheduled_date: { $gte: tomorrow, $lte: nextDay },
+//     }).populate("recruiterId", "name email");
 
-    for (const interview of upcomingInterviews) {
-      await Notification.create({
-        userId: interview.recruiterId._id,
-        message: `Reminder: You have an interview titled "${interview.title}" scheduled for tomorrow.`,
-        status: "unread",
-      });
+//     for (const interview of upcomingInterviews) {
+//       await Notification.create({
+//         userId: interview.recruiterId._id,
+//         message: `Reminder: You have an interview titled "${interview.title}" scheduled for tomorrow.`,
+//         status: "unread",
+//       });
 
-      for (const candidateId of interview.candidates) {
-        await Notification.create({
-          userId: candidateId,
-          message: `Reminder: You have an interview titled "${interview.title}" scheduled for tomorrow.`,
-          status: "unread",
-        });
-      }
-    }
+//       for (const candidateId of interview.candidates) {
+//         await Notification.create({
+//           userId: candidateId,
+//           message: `Reminder: You have an interview titled "${interview.title}" scheduled for tomorrow.`,
+//           status: "unread",
+//         });
+//       }
+//     }
 
-    console.log(
-      `✅ Notifications sent for ${upcomingInterviews.length} upcoming interviews.`
-    );
-  } catch (error) {
-    console.error("❌ Error checking upcoming interviews:", error.message);
-  }
-};
+//     console.log(
+//       `✅ Notifications sent for ${upcomingInterviews.length} upcoming interviews.`
+//     );
+//   } catch (error) {
+//     console.error("❌ Error checking upcoming interviews:", error.message);
+//   }
+// };
 
-setInterval(checkUpcomingInterviews, 24 * 60 * 60 * 1000);
+// // setInterval(checkUpcomingInterviews, 24 * 60 * 60 * 1000);
 
 
 
