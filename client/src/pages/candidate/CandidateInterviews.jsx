@@ -57,12 +57,14 @@ const CandidateInterviews = () => {
                 </td>
                 <td>{new Date(interview.scheduled_date).toLocaleString()}</td>
                 <td>
-                  {interview.alreadySubmitted ? (
-                    <span style={{ color: "green", fontWeight: "bold" }}>
-                      Submitted
-                    </span>
-                  ) : (
-                    <span style={{ color: "orange" }}>Pending</span>
+                  {interview.status === "submitted" && (
+                    <span style={{ color: "green", fontWeight: "bold" }}>Submitted</span>
+                  )}
+                  {interview.status === "submitted late" && (
+                    <span style={{ color: "orange", fontWeight: "bold" }}>Submitted Late</span>
+                  )}
+                  {interview.status === "pending" && (
+                    <span style={{ color: "gray" }}>Pending</span>
                   )}
                 </td>
                 <td>

@@ -123,19 +123,19 @@ router.get("/interviews", async (req, res) => {
       .populate("recruiterId", "name email")
       .sort({ scheduled_date: -1 });
 
-    // ✅ Attach 'alreadySubmitted' flag for each interview
-    const interviewsWithSubmissionStatus = interviews.map((interview) => {
-      const alreadySubmitted = interview.responses.some(
-        (response) => response.candidate.toString() === candidateId.toString()
+    const interviewsWithStatus = interviews.map((interview) => {
+      const response = interview.responses.find(
+        (res) => res.candidate.toString() === candidateId.toString()
       );
-
+    
       return {
-        ...interview.toObject(), // convert to plain object
-        alreadySubmitted,
+        ...interview.toObject(),
+        alreadySubmitted: !!response,
+        status: response ? response.status : "pending"
       };
     });
 
-    res.json({ interviews: interviewsWithSubmissionStatus });
+    res.json({ interviews: interviewsWithStatus });
   } catch (error) {
     console.error("❌ Error fetching interviews:", error.message);
     res.status(500).json({ message: "Error fetching interviews" });
@@ -211,12 +211,17 @@ router.post("/interview/:id/submit", upload.array("fileAnswers", 5), async (req,
       }
     }
 
+    const submittedAt = new Date();
+    const scheduledTime = new Date(interview.scheduled_date);
+    const isLate = submittedAt > scheduledTime;
+
     // ✅ Save response with null marks initially
     const newResponse = {
       candidate: candidateId,
       answers: processedAnswers,
       videoMarks: [],
       marks: null,
+      status: isLate ? "submitted late" : "submitted", // ✅ set status here
     };
 
     interview.responses.push(newResponse);

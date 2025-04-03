@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -15,6 +15,10 @@ const CandidateAnswer = () => {
   const [timerStarted, setTimerStarted] = useState(false);
   const cloudinaryPreset = "interview_responses"; // Update from Cloudinary settings
   const cloudinaryUploadURL = "https://api.cloudinary.com/v1_1/dnxuioifx/video/upload"; // Cloudinary Upload URL
+  const mediaRecorders = useRef({});
+  const recordedBlobMap = useRef({});
+  const streamMap = useRef({});
+
 
   useEffect(() => {
     const fetchInterviewDetails = async () => {
@@ -78,17 +82,19 @@ const CandidateAnswer = () => {
       .then((stream) => {
         const videoPreview = document.getElementById(`video-preview-${index}`);
         videoPreview.srcObject = stream;
-        videoPreview.muted = true; // ensures no feedback noise
-        videoPreview.play(); // Start playing live stream  
-        mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
-        recordedBlobs = [];
-
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) recordedBlobs.push(event.data);
+        videoPreview.muted = true;
+        videoPreview.play();
+  
+        const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+        recordedBlobMap.current[index] = [];
+  
+        recorder.ondataavailable = (event) => {
+          if (event.data.size > 0) recordedBlobMap.current[index].push(event.data);
         };
-
-        mediaRecorder.start();
-        isRecording = true;
+  
+        recorder.start();
+        mediaRecorders.current[index] = recorder;
+        streamMap.current[index] = stream;
       })
       .catch((error) => {
         console.error("❌ Error accessing camera:", error);
@@ -96,34 +102,40 @@ const CandidateAnswer = () => {
   };
 
   const stopVideoRecording = async (index) => {
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
-      mediaRecorder.stop();
-
-      mediaRecorder.onstop = async () => {
-        const videoBlob = new Blob(recordedBlobs, { type: "video/webm" });
+    const recorder = mediaRecorders.current[index];
+    const stream = streamMap.current[index];
+  
+    if (recorder && recorder.state !== "inactive") {
+      recorder.stop();
+  
+      recorder.onstop = async () => {
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+        }
+  
+        const videoBlob = new Blob(recordedBlobMap.current[index], { type: "video/webm" });
         const videoUrl = URL.createObjectURL(videoBlob);
         const videoPreview = document.getElementById(`video-preview-${index}`);
         videoPreview.srcObject = null;
         videoPreview.src = videoUrl;
         videoPreview.controls = true;
-
+  
         setIsUploading(true);
-
-        // ✅ Upload Video to Cloudinary
-        let formData = new FormData();
+  
+        const formData = new FormData();
         formData.append("file", videoBlob);
         formData.append("upload_preset", cloudinaryPreset);
-
+  
         try {
           const res = await fetch(cloudinaryUploadURL, {
             method: "POST",
             body: formData,
           });
-
+  
           const data = await res.json();
-          setRecordedVideos({ ...recordedVideos, [index]: data.secure_url });
+          setRecordedVideos((prev) => ({ ...prev, [index]: data.secure_url }));
           setIsUploading(false);
-          setVideoUploaded(true); // ✅ Set flag to true after upload
+          setVideoUploaded(true);
         } catch (error) {
           console.error("❌ Error uploading video to Cloudinary:", error);
           setIsUploading(false);

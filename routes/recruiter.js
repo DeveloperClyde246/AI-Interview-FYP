@@ -115,14 +115,14 @@ router.post("/create-interview", async (req, res) => {
     console.log("Scheduled Date (Parsed):", new Date(scheduled_date));
 
     const parsedDate = new Date(scheduled_date);
-    const localDate = new Date(parsedDate.getTime() - parsedDate.getTimezoneOffset() * 60000); 
+    //const localDate = new Date(parsedDate.getTime() - parsedDate.getTimezoneOffset() * 60000); 
 
     // ✅ Create new interview with formatted questions
     const interview = new Interview({
       recruiterId,
       title,
       description,
-      scheduled_date: localDate,
+      scheduled_date: parsedDate,
       answerDuration: answerDuration || 60, 
       questions: formattedQuestions,
       candidates: candidateIds ? candidateIds.map((id) => new mongoose.Types.ObjectId(id)) : [],
