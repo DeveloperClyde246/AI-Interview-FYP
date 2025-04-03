@@ -245,7 +245,14 @@ const CandidateAnswer = () => {
           </div>
         ))}
 
-        <button type="submit" id="submit-btn" disabled={isUploading || !videoUploaded}>
+        <button
+          type="submit"
+          id="submit-btn"
+          disabled={
+            isUploading ||
+            (interview.questions.some(q => q.answerType === "recording") && !videoUploaded)
+          }
+        >
           Submit Answers
         </button>
       </form>

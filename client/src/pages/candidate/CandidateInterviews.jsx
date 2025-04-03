@@ -68,13 +68,9 @@ const CandidateInterviews = () => {
                   )}
                 </td>
                 <td>
-                  {interview.alreadySubmitted ? (
-                    <span style={{ color: "gray" }}>✔ Answered</span>
-                  ) : (
-                    <Link to={`/candidate/interview/${interview._id}`}>
-                      Answer Questions
+                    <Link to={`/candidate/interview-details/${interview._id}`}>
+                      View Details
                     </Link>
-                  )}
                 </td>
               </tr>
             ))

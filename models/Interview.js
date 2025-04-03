@@ -18,7 +18,8 @@ const InterviewSchema = new mongoose.Schema({
       answers: [String],
       videoMarks: [Number], // ✅ Store individual video marks
       marks: { type: Number, default: null } ,// ✅ Store average mark
-      status: { type: String, enum: ["pending", "submitted", "submitted late"], default: "pending" }
+      status: { type: String, enum: ["pending", "submitted", "submitted late"], default: "pending" },
+      submitDateTime: { type: Date }
     }
   ],
   createdAt: { type: Date, default: Date.now },

@@ -21,6 +21,7 @@ import CandidateInterviews from "./pages/candidate/CandidateInterviews";
 import CandidateNotificationDetails from "./pages/candidate/CandidateNotificationDetails";
 import CandidateAnswer from "./pages/candidate/CandidateAnswer";
 import CandidateProfile from "./pages/candidate/CandidateProfile";
+import CandidateInterviewDetails from "./pages/candidate/CandidateInterviewDetails";
 
 function App() {
   return (
@@ -48,7 +49,7 @@ function App() {
         <Route path="/candidate/notifications/:id" element={<CandidateNotificationDetails />} />
         <Route path="/candidate/interview/:id" element={<CandidateAnswer />} />
         <Route path="/candidate/profile" element={<CandidateProfile />} />
-        
+        <Route path="/candidate/interview-details/:id" element={<CandidateInterviewDetails />} />
 
       </Routes>
     </BrowserRouter>

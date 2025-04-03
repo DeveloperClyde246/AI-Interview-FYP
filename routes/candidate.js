@@ -143,22 +143,67 @@ router.get("/interviews", async (req, res) => {
 });
 
 
-// ✅ Get Interview Details and Questions
+// ✅ Get Interview Details and Status
 router.get("/interview/:id", async (req, res) => {
   try {
-    const interview = await Interview.findById(req.params.id);
-    if (!interview) return res.status(404).json({ message: "Interview not found" });
-    // const alreadySubmitted = interview.responses.some(
-    //   (res) => res.candidate.toString() === req.user.id
-    // );
+    const candidateId = req.user.id;
 
-    res.json({ interview });
+    // ✅ Populate recruiter details
+    const interview = await Interview.findById(req.params.id).populate("recruiterId", "name email");
+
+    if (!interview) {
+      return res.status(404).json({ message: "Interview not found" });
+    }
+
+    // ✅ Find candidate response (if any)
+    const response = interview.responses.find(
+      (res) => res.candidate.toString() === candidateId
+    );
+
+    const status = response?.status || "pending";
+
+    res.json({ interview, status });
   } catch (error) {
     console.error("❌ Error fetching interview:", error.message);
     res.status(500).json({ message: "Error fetching interview" });
   }
 });
 
+
+// ✅ Get Interview Results
+router.get("/interview/:id/results", async (req, res) => {
+  try {
+    const candidateId = req.user.id;
+    const interview = await Interview.findById(req.params.id)
+      .populate("recruiterId", "name email");
+
+    if (!interview) {
+      return res.status(404).json({ message: "Interview not found" });
+    }
+
+    const response = interview.responses.find(
+      (res) => res.candidate.toString() === candidateId
+    );
+
+    if (!response) {
+      return res.status(404).json({ message: "You have not submitted this interview." });
+    }
+
+    res.json({
+      title: interview.title,
+      recruiter: interview.recruiterId,
+      questions: interview.questions,
+      answers: response.answers,
+      videoMarks: response.videoMarks,
+      averageMark: response.marks,
+      submitDateTime: response.submitDateTime,
+      status: response.status,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching result:", err.message);
+    res.status(500).json({ message: "Error fetching result" });
+  }
+});
 
 // ✅ Submit Interview Answers
 const storage = new CloudinaryStorage({
@@ -222,6 +267,7 @@ router.post("/interview/:id/submit", upload.array("fileAnswers", 5), async (req,
       videoMarks: [],
       marks: null,
       status: isLate ? "submitted late" : "submitted", // ✅ set status here
+      submitDateTime: submittedAt,
     };
 
     interview.responses.push(newResponse);
