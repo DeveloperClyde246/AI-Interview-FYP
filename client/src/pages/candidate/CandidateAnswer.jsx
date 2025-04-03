@@ -11,6 +11,8 @@ const CandidateAnswer = () => {
   const [recordedVideos, setRecordedVideos] = useState({});
   const [isUploading, setIsUploading] = useState(false);
   const [videoUploaded, setVideoUploaded] = useState(false); // ✅ Track if video is uploaded
+  const [timeLeft, setTimeLeft] = useState(null);
+  const [timerStarted, setTimerStarted] = useState(false);
   const cloudinaryPreset = "interview_responses"; // Update from Cloudinary settings
   const cloudinaryUploadURL = "https://api.cloudinary.com/v1_1/dnxuioifx/video/upload"; // Cloudinary Upload URL
 
@@ -22,6 +24,14 @@ const CandidateAnswer = () => {
         });
         setInterview(res.data.interview);
         setAnswers(Array(res.data.interview.questions.length).fill(""));
+
+        // Start timer only once
+        if (!timerStarted) {
+          const durationInSeconds = res.data.interview.answerDuration * 60; // Convert minutes to seconds
+          setTimeLeft(durationInSeconds);
+          setTimerStarted(true);
+        }
+
       } catch (err) {
         console.error("Error fetching interview:", err);
         alert("Error loading interview details.");
@@ -30,6 +40,21 @@ const CandidateAnswer = () => {
 
     fetchInterviewDetails();
   }, [id]);
+
+  // ✅ Timer Logic
+  useEffect(() => {
+    if (!timerStarted || timeLeft === null) return;
+  
+    if (timeLeft === 0) {
+      alert("Time's up! Submitting your answers automatically.");
+      handleSubmit(new Event("submit")); // auto-submit
+      return;
+    }
+  
+    const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [timeLeft, timerStarted]);
+
 
   // ✅ Handle Text and File Changes
   const handleInputChange = (index, value) => {
@@ -147,11 +172,25 @@ const CandidateAnswer = () => {
     }
   };
 
+
   if (!interview) return <p>Loading...</p>;
+
+  // ✅ Format Time Left
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
 
   return (
     <div>
       <h2>Answer Questions - {interview.title}</h2>
+      {timeLeft !== null && (
+        <h3 style={{ color: "red" }}>
+          Time Remaining: {formatTime(timeLeft)}
+        </h3>
+      )}
       <form id="answer-form" onSubmit={handleSubmit} encType="multipart/form-data">
         {interview.questions.map((question, index) => (
           <div key={index}>

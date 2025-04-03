@@ -39,13 +39,14 @@ const CandidateInterviews = () => {
             <th>Title</th>
             <th>Recruiter</th>
             <th>Scheduled Date</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {interviews.length === 0 ? (
             <tr>
-              <td colSpan="4">No assigned interviews</td>
+              <td colSpan="5">No assigned interviews</td>
             </tr>
           ) : (
             interviews.map((interview) => (
@@ -54,13 +55,24 @@ const CandidateInterviews = () => {
                 <td>
                   {interview.recruiterId.name} ({interview.recruiterId.email})
                 </td>
+                <td>{new Date(interview.scheduled_date).toLocaleString()}</td>
                 <td>
-                  {new Date(interview.scheduled_date).toLocaleString()}
+                  {interview.alreadySubmitted ? (
+                    <span style={{ color: "green", fontWeight: "bold" }}>
+                      Submitted
+                    </span>
+                  ) : (
+                    <span style={{ color: "orange" }}>Pending</span>
+                  )}
                 </td>
                 <td>
-                  <Link to={`/candidate/interview/${interview._id}`}>
-                    Answer Questions
-                  </Link>
+                  {interview.alreadySubmitted ? (
+                    <span style={{ color: "gray" }}>✔ Answered</span>
+                  ) : (
+                    <Link to={`/candidate/interview/${interview._id}`}>
+                      Answer Questions
+                    </Link>
+                  )}
                 </td>
               </tr>
             ))
@@ -69,7 +81,7 @@ const CandidateInterviews = () => {
       </table>
 
       <Link to="/candidate" className="back-link">
-        Back to Dashboard
+        ← Back to Dashboard
       </Link>
     </div>
   );

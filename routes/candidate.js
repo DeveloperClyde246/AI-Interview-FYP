@@ -123,18 +123,34 @@ router.get("/interviews", async (req, res) => {
       .populate("recruiterId", "name email")
       .sort({ scheduled_date: -1 });
 
-    res.json({ interviews });
+    // ✅ Attach 'alreadySubmitted' flag for each interview
+    const interviewsWithSubmissionStatus = interviews.map((interview) => {
+      const alreadySubmitted = interview.responses.some(
+        (response) => response.candidate.toString() === candidateId.toString()
+      );
+
+      return {
+        ...interview.toObject(), // convert to plain object
+        alreadySubmitted,
+      };
+    });
+
+    res.json({ interviews: interviewsWithSubmissionStatus });
   } catch (error) {
     console.error("❌ Error fetching interviews:", error.message);
     res.status(500).json({ message: "Error fetching interviews" });
   }
 });
 
+
 // ✅ Get Interview Details and Questions
 router.get("/interview/:id", async (req, res) => {
   try {
     const interview = await Interview.findById(req.params.id);
     if (!interview) return res.status(404).json({ message: "Interview not found" });
+    // const alreadySubmitted = interview.responses.some(
+    //   (res) => res.candidate.toString() === req.user.id
+    // );
 
     res.json({ interview });
   } catch (error) {
@@ -142,6 +158,7 @@ router.get("/interview/:id", async (req, res) => {
     res.status(500).json({ message: "Error fetching interview" });
   }
 });
+
 
 // ✅ Submit Interview Answers
 const storage = new CloudinaryStorage({

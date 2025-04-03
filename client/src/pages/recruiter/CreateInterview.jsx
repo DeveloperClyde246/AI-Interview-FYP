@@ -109,7 +109,7 @@ const CreateInterview = () => {
           name="answerDuration"
           value={form.answerDuration}
           onChange={handleChange}
-          min="10"
+          min="1"
           required
         />
 
