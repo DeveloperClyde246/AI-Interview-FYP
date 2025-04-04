@@ -32,8 +32,40 @@ const CandidateProfileDetails = () => {
   return (
     <div>
       <h2>My Profile</h2>
+
       <p><strong>Name:</strong> {candidate.name}</p>
       <p><strong>Email:</strong> {candidate.email}</p>
+      <p><strong>Contact Number:</strong> {candidate.contactNumber || "Not provided"}</p>
+      <p><strong>Role Applied:</strong> {candidate.roleApplied || "Not specified"}</p>
+      <p><strong>Introduction:</strong> {candidate.introduction || "No introduction provided."}</p>
+
+      <div>
+        <strong>Skills:</strong>
+        {candidate.skills && candidate.skills.length > 0 ? (
+          <ul>
+            {candidate.skills.map((skill, idx) => (
+              <li key={idx}>{skill}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No skills listed.</p>
+        )}
+      </div>
+
+      <div>
+        <strong>Education:</strong>
+        {candidate.education && candidate.education.length > 0 ? (
+          <ul>
+            {candidate.education.map((edu, idx) => (
+              <li key={idx}>
+                {edu.degree} from {edu.institution} ({edu.yearOfCompletion})
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No education details provided.</p>
+        )}
+      </div>
 
       <button onClick={() => navigate("/candidate/profile/edit")}>
         Edit Profile

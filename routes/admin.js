@@ -2,7 +2,9 @@ const express = require("express");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const authMiddleware = require("../middleware/authMiddleware");
-
+const Candidate = require("../models/candidate");
+const Recruiter = require("../models/Recruiter"); 
+const Admin = require("../models/Admin");
 const router = express.Router();
 
 // ✅ Only allow admin users
@@ -22,6 +24,7 @@ router.get("/", async (req, res) => {
 // ✅ POST create new user
 router.post("/create", async (req, res) => {
   const { name, email, password, role } = req.body;
+  const existingUser = await User.findOne({ email });
 
   if (!name || !email || !password || !role) {
     return res.status(400).json({ message: "All fields are required" });
@@ -43,6 +46,34 @@ router.post("/create", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ name, email, password: hashedPassword, role });
     await user.save();
+
+    if (role === "candidate") {
+      await Candidate.create({
+        userId: user._id,
+        roleApplied: "",
+        skills: [],
+        introduction: "",
+        education: [],
+        contactNumber: "+60123456789"
+      });
+    }
+
+    if (role === "recruiter") {
+      await Recruiter.create({
+        userId: user._id,
+        jobTitle: "Default Job Title",
+        contactNumber: "+60123456789",
+        // dateOfJoining is automatically set
+      });
+    }
+
+    if (role === "admin") {
+      await Admin.create({
+        userId: user._id,
+        isSuperAdmin: false, // or true if needed
+      });
+    }
+
 
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {

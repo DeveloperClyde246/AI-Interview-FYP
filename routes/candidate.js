@@ -9,6 +9,7 @@ const multer = require("multer");
 const cloudinary = require("../config/cloudinary");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const axios = require("axios");
+const Candidate = require("../models/candidate");
 
 const router = express.Router();
 
