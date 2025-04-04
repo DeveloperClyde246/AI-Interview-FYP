@@ -7,6 +7,9 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 //admin
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminEditUser from "./pages/admin/AdminEditUser";
+import AdminChangePassword from "./pages/admin/AdminChangePassword";
+
 //recruiter
 import RecruiterDashboard from "./pages/recruiter/RecruiterDashboard";
 import RecruiterInterviews from "./pages/recruiter/RecruiterInterviews";
@@ -42,6 +45,8 @@ function App() {
 
         {/* admin */}
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin-dashboard/edit/:id" element={<AdminEditUser />} />
+        <Route path="/admin-dashboard/change-password/:id" element={<AdminChangePassword />} />
 
         {/* recruiter */}
         <Route path="/recruiter" element={<RecruiterDashboard />} />

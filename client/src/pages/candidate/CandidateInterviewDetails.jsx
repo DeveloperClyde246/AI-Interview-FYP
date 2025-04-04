@@ -7,6 +7,7 @@ const CandidateInterviewDetails = () => {
   const navigate = useNavigate();
   const [interview, setInterview] = useState(null);
   const [status, setStatus] = useState("");
+  const [submitDateTime, setSubmitDateTime] = useState(null);
 
   useEffect(() => {
     const fetchInterview = async () => {
@@ -16,6 +17,7 @@ const CandidateInterviewDetails = () => {
         });
         setInterview(res.data.interview);
         setStatus(res.data.status || "pending");
+        setSubmitDateTime(res.data.submitDateTime || null);
       } catch (err) {
         console.error("Error fetching interview:", err);
         alert("Failed to load interview details.");
@@ -36,16 +38,21 @@ const CandidateInterviewDetails = () => {
       <p><strong>Duration:</strong> {interview.answerDuration} minutes</p>
       <p><strong>Recruiter:</strong> {interview.recruiterId?.name} ({interview.recruiterId?.email})</p>
       <p><strong>Status:</strong> {status}</p>
+
+      {submitDateTime && (
+        <p><strong>Submitted At:</strong> {new Date(submitDateTime).toLocaleString()}</p>
+      )}
+
       <p>You are only allowed to answer the interview once.</p>
 
       {status === "pending" ? (
         <button
-            onClick={() => {
+          onClick={() => {
             const confirmStart = window.confirm("Are you sure you want to start the interview now? The timer will begin immediately.");
             if (confirmStart) {
-                navigate(`/candidate/interview/${interview._id}`);
+              navigate(`/candidate/interview/${interview._id}`);
             }
-            }}
+          }}
         >
           Start Answering
         </button>

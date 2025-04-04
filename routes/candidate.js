@@ -193,13 +193,15 @@ router.get("/interview/:id", async (req, res) => {
     );
 
     const status = response?.status || "pending";
+    const submitDateTime = response?.submitDateTime || null;
 
-    res.json({ interview, status });
+    res.json({ interview, status, submitDateTime }); // ✅ Include submitDateTime
   } catch (error) {
     console.error("❌ Error fetching interview:", error.message);
     res.status(500).json({ message: "Error fetching interview" });
   }
 });
+
 
 
 // ✅ Get Interview Results

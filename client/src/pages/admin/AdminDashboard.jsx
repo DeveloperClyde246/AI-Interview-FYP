@@ -5,12 +5,16 @@ import { Link, useNavigate } from "react-router-dom";
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "candidate" });
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const fetchUsers = async () => {
-    const res = await axios.get("http://localhost:5000/admin-dashboard", { withCredentials: true });
-    setUsers(res.data);
+    try {
+      const res = await axios.get("http://localhost:5000/admin-dashboard", { withCredentials: true });
+      setUsers(res.data);
+    } catch (err) {
+      console.error("❌ Error fetching users:", err);
+      alert("Failed to load users. Please try again later.");
+    }
   };
 
   useEffect(() => {
@@ -23,8 +27,7 @@ const AdminDashboard = () => {
 
   const createUser = async (e) => {
     e.preventDefault();
-    setError(""); // clear previous error
-  
+
     try {
       await axios.post("http://localhost:5000/admin-dashboard/create", form, {
         withCredentials: true,
@@ -33,54 +36,61 @@ const AdminDashboard = () => {
       fetchUsers();
     } catch (err) {
       if (err.response?.status === 409) {
-        setError("Email already exists.");
+        alert("Email already exists.");
       } else if (err.response?.status === 400) {
-        setError("Invalid email format or missing field.");
+        alert("Invalid email format or missing field.");
       } else {
-        setError("Server error while creating user.");
-        console.error(err); // still log it
+        alert("Server error while creating user.");
+        console.error("❌ Create error:", err);
       }
     }
   };
-  
 
   const updateUser = async (id, updates) => {
-    await axios.post(`http://localhost:5000/admin-dashboard/edit/${id}`, updates, {
-      withCredentials: true,
-    });
-    fetchUsers();
+    try {
+      await axios.post(`http://localhost:5000/admin-dashboard/edit/${id}`, updates, {
+        withCredentials: true,
+      });
+      fetchUsers();
+    } catch (err) {
+      console.error("❌ Error updating user:", err);
+      alert("Failed to update user.");
+    }
   };
 
   const deleteUser = async (id) => {
-    if (window.confirm("Are you sure?")) {
+    const confirm = window.confirm("Are you sure?");
+    if (!confirm) return;
+
+    try {
       await axios.post(`http://localhost:5000/admin-dashboard/delete/${id}`, {}, {
         withCredentials: true,
       });
       fetchUsers();
+    } catch (err) {
+      console.error("❌ Error deleting user:", err);
+      if (err.response?.status === 403) {
+        alert("You cannot delete the main admin account.");
+      } else {
+        alert("Failed to delete user.");
+      }
     }
   };
 
-  // ✅ Handle Logout
   const handleLogout = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/auth/logout",
-        {},
-        { withCredentials: true }
-      );
+      const res = await axios.get("http://localhost:5000/auth/logout", { withCredentials: true });
 
       if (res.status === 200) {
-        alert("Logout successful!");
         navigate("/login");
       } else {
         alert("Logout failed. Please try again.");
       }
     } catch (err) {
-      console.error("Error during logout:", err);
+      console.error("❌ Error during logout:", err);
       alert("Error logging out. Please try again.");
     }
   };
-
 
   return (
     <div>
@@ -111,22 +121,8 @@ const AdminDashboard = () => {
               <td>{u.email}</td>
               <td>{u.role}</td>
               <td>
-                <button onClick={() => {
-                  const name = prompt("New name:", u.name);
-                  const email = prompt("New email:", u.email);
-                  const role = prompt("New role (candidate/recruiter/admin):", u.role);
-                  updateUser(u._id, { name, email, role });
-                }}>Edit</button>
-
-                <button onClick={() => {
-                  const newPassword = prompt("New password:");
-                  if (newPassword) {
-                    axios.post(`http://localhost:5000/admin-dashboard/change-password/${u._id}`, {
-                      newPassword
-                    }, { withCredentials: true }).then(fetchUsers);
-                  }
-                }}>Change Password</button>
-
+                <button onClick={() => navigate(`/admin-dashboard/edit/${u._id}`)}>Edit</button>
+                <button onClick={() => navigate(`/admin-dashboard/change-password/${u._id}`)}>Change Password</button>
                 <button onClick={() => deleteUser(u._id)}>Delete</button>
               </td>
             </tr>
@@ -134,9 +130,8 @@ const AdminDashboard = () => {
         </tbody>
       </table>
 
-      {/* ✅ Logout Button */}
+      <br />
       <button onClick={handleLogout}>Logout</button>
-      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 };
