@@ -160,7 +160,7 @@ const CandidateEditProfile = () => {
 
         <label>Education:</label>
         {form.education.map((edu, index) => (
-          <div key={index}>
+          <div key={index} style={{ marginBottom: "10px" }}>
             <input
               placeholder="Degree"
               value={edu.degree}
@@ -180,13 +180,26 @@ const CandidateEditProfile = () => {
               onChange={(e) => handleEducationChange(index, "yearOfCompletion", e.target.value)}
               required
             />
+            {form.education.length > 1 && (
+              <button
+                type="button"
+                onClick={() => {
+                  const updatedEducation = [...form.education];
+                  updatedEducation.splice(index, 1);
+                  setForm({ ...form, education: updatedEducation });
+                }}
+                style={{ marginLeft: "10px", color: "red" }}
+              >
+                Remove
+              </button>
+            )}
           </div>
         ))}
         <button type="button" onClick={addEducation}>+ Add Education</button><br />
 
         <button type="submit">Update Profile</button>
       </form>
-
+{/* 
       <h3>Change Password</h3>
       <form onSubmit={handlePasswordChange}>
         <label>Current Password:</label>
@@ -212,8 +225,8 @@ const CandidateEditProfile = () => {
         <button type="submit">Change Password</button>
       </form>
 
-      <br />
-      <button onClick={() => navigate("/candidate")}>Back to Dashboard</button>
+      <br /> */}
+      <button onClick={() => navigate("/candidate/profile")}>Back to Profile</button>
     </div>
   );
 };

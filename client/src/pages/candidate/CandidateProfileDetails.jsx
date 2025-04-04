@@ -58,7 +58,7 @@ const CandidateProfileDetails = () => {
           <ul>
             {candidate.education.map((edu, idx) => (
               <li key={idx}>
-                {edu.degree} from {edu.institution} ({edu.yearOfCompletion})
+                {edu.degree} from {edu.institution}  ({edu.yearOfCompletion} years)
               </li>
             ))}
           </ul>
@@ -70,6 +70,9 @@ const CandidateProfileDetails = () => {
       <button onClick={() => navigate("/candidate/profile/edit")}>
         Edit Profile
       </button>
+
+      <br />
+      <button onClick={() => navigate("/candidate/profile/change-password")}>Change Password</button>
 
       <br />
       <button onClick={() => navigate("/candidate")}>Back to Dashboard</button>

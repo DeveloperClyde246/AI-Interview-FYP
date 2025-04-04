@@ -28,7 +28,7 @@ import CandidateProfileDetails from "./pages/candidate/CandidateProfileDetails";
 import CandidateEditProfile from "./pages/candidate/CandidateEditProfile";
 import CandidateInterviewDetails from "./pages/candidate/CandidateInterviewDetails";
 import CandidateInterviewResults from "./pages/candidate/CandidateInterviewResults";
-
+import CandidateChangePassword from "./pages/candidate/CandidateChangePassword";
 
 function App() {
   return (
@@ -62,6 +62,7 @@ function App() {
         <Route path="/candidate/profile/edit" element={<CandidateEditProfile />} />
         <Route path="/candidate/interview-details/:id" element={<CandidateInterviewDetails />} />
         <Route path="/candidate/interview/:id/results" element={<CandidateInterviewResults />} />
+        <Route path="/candidate/profile/change-password" element={<CandidateChangePassword />} />
 
 
 

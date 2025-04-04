@@ -3,6 +3,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 const Notification = require("../models/Notification");
 const Interview = require("../models/Interview");
 const User = require("../models/User");
+const Candidate = require("../models/candidate");
 const mongoose = require("mongoose");
 
 const router = express.Router();
@@ -267,20 +268,29 @@ router.get("/candidate-details/:interviewId/:candidateId", async (req, res) => {
   try {
     const interview = await Interview.findById(interviewId)
       .populate("responses.candidate", "name email")
-      .populate("candidates", "name email");
+      .populate("candidates", "_id"); // we will fetch full candidate info separately
 
     if (!interview) return res.status(404).json({ message: "Interview not found" });
 
     const response = interview.responses.find(
-      (r) => r.candidate._id.toString() === candidateId
+      (r) => r.candidate?._id.toString() === candidateId
     );
 
-    const candidate = interview.candidates.find(
-      (c) => c._id.toString() === candidateId
-    );
+    // ✅ Find candidate document from Candidate model
+    const candidateProfile = await Candidate.findOne({ userId: candidateId }).lean();
+    const userProfile = await User.findById(candidateId).lean();
+
+    if (!candidateProfile || !userProfile) {
+      return res.status(404).json({ message: "Candidate not found" });
+    }
+
+    const fullCandidate = {
+      ...userProfile,
+      ...candidateProfile
+    };
 
     res.json({
-      candidate,
+      candidate: fullCandidate,
       response: response || null,
     });
   } catch (error) {
