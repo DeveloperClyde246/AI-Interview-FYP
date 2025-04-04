@@ -70,7 +70,7 @@ router.post("/create", async (req, res) => {
     if (role === "admin") {
       await Admin.create({
         userId: user._id,
-        isSuperAdmin: false, // or true if needed
+        isSuperAdmin: false, 
       });
     }
 

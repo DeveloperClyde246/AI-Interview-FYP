@@ -59,10 +59,10 @@ const RecruiterInterviewViewDetails = () => {
 
       <br />
       <div>
-        <Link to={`/recruiter/interview/${id}/manage`}>
+        <Link to={`/recruiter/interview/${id}/manage-candidates`}>
           <button>Manage Candidates</button>
         </Link>{" "}
-        <Link to={`/recruiter/interview/${id}/edit`}>
+        <Link to={`/recruiter/interview/${id}/edit-form`}>
           <button>Edit Interview Form</button>
         </Link>
       </div>

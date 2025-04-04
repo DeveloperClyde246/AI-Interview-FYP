@@ -13,6 +13,10 @@ import RecruiterInterviews from "./pages/recruiter/RecruiterInterviews";
 import RecruiterInterviewDetails from "./pages/recruiter/RecruiterInterviewDetails";
 import RecruiterInterviewResults from "./pages/recruiter/RecruiterInterviewResults";
 import NotificationDetails from "./pages/recruiter/NotificationDetails";
+import RecruiterCandidateDetails from "./pages/recruiter/RecruiterCandidateDetails";
+import RecruiterInterviewEdit from "./pages/recruiter/RecruiterInterviewEdit";
+import RecruiterManageCandidate from "./pages/recruiter/RecruiterManageCandidate";
+
 //candidate
 import CreateInterview from "./pages/recruiter/CreateInterview";
 import CandidateFAQ from "./pages/candidate/CandidateFAQ";
@@ -24,7 +28,7 @@ import CandidateProfileDetails from "./pages/candidate/CandidateProfileDetails";
 import CandidateEditProfile from "./pages/candidate/CandidateEditProfile";
 import CandidateInterviewDetails from "./pages/candidate/CandidateInterviewDetails";
 import CandidateInterviewResults from "./pages/candidate/CandidateInterviewResults";
-import RecruiterCandidateDetails from "./pages/recruiter/RecruiterCandidateDetails";
+
 
 function App() {
   return (
@@ -45,6 +49,8 @@ function App() {
         <Route path="/recruiter/notifications/:id" element={<NotificationDetails />} />
         <Route path="/recruiter/create-interview" element={<CreateInterview />} />
         <Route path="/recruiter/candidate-details/:interviewId/:candidateId" element={<RecruiterCandidateDetails />}/>
+        <Route path="/recruiter/interview/:id/edit-form" element={<RecruiterInterviewEdit />} />
+        <Route path="/recruiter/interview/:id/manage-candidates" element={<RecruiterManageCandidate />} />
 
         {/* candidate */}
         <Route path="/candidate/faq" element={<CandidateFAQ />} />
