@@ -249,6 +249,7 @@ router.get("/interview-results", async (req, res) => {
 
     const interviews = await Interview.find({ recruiterId })
       .populate("responses.candidate", "name email")
+      .populate("candidates", "name email")
       .sort({ createdAt: -1 });
 
     res.json({ interviews });
@@ -257,6 +258,37 @@ router.get("/interview-results", async (req, res) => {
     res.status(500).json({ message: "Error loading results" });
   }
 });
+
+
+// ✅ View candidate profile + response details
+router.get("/candidate-details/:interviewId/:candidateId", async (req, res) => {
+  const { interviewId, candidateId } = req.params;
+
+  try {
+    const interview = await Interview.findById(interviewId)
+      .populate("responses.candidate", "name email")
+      .populate("candidates", "name email");
+
+    if (!interview) return res.status(404).json({ message: "Interview not found" });
+
+    const response = interview.responses.find(
+      (r) => r.candidate._id.toString() === candidateId
+    );
+
+    const candidate = interview.candidates.find(
+      (c) => c._id.toString() === candidateId
+    );
+
+    res.json({
+      candidate,
+      response: response || null,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching candidate details:", error.message);
+    res.status(500).json({ message: "Error fetching candidate details" });
+  }
+});
+
 
 // ✅ Delete candidate response for an interview
 router.post("/interview/:interviewId/delete-response", async (req, res) => {

@@ -75,6 +75,7 @@ const RecruiterInterviews = () => {
         </tbody>
       </table>
 
+      <Link to="/recruiter/create-interview">Create New Interview</Link>
       {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );

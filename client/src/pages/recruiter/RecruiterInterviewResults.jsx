@@ -36,25 +36,31 @@ const RecruiterInterviewResults = () => {
             </h3>
             <p>{interview.description}</p>
 
-            {interview.responses.length === 0 ? (
-              <p>No candidates have answered yet.</p>
-            ) : (
-              <table border="1" cellPadding="5">
-                <thead>
-                  <tr>
-                    <th>Candidate</th>
-                    <th>Email</th>
-                    <th>Marks</th>
-                    <th>Submitted Answers</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {interview.responses.map((response, idx) => (
-                    <tr key={idx}>
-                      <td>{response.candidate?.name || "Unknown"}</td>
-                      <td>{response.candidate?.email || "Unknown"}</td>
+            <h4>All Candidates</h4>
+            <table border="1" cellPadding="5">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Marks</th>
+                  <th>Answers</th>
+                  <th>View Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {interview.candidates.map((candidate) => {
+                  const response = interview.responses.find(
+                    (r) => r.candidate?._id === candidate._id
+                  );
+
+                  return (
+                    <tr key={candidate._id}>
+                      <td>{candidate.name}</td>
+                      <td>{candidate.email}</td>
+                      <td>{response ? "Submitted" : "Pending"}</td>
                       <td>
-                        {response.videoMarks && response.videoMarks.length > 0 ? (
+                        {response && response.videoMarks?.length > 0 ? (
                           <>
                             <ul>
                               {response.videoMarks.map((mark, i) => (
@@ -64,50 +70,59 @@ const RecruiterInterviewResults = () => {
                             <strong>Average: {response.marks} marks</strong>
                           </>
                         ) : (
-                          <i>Pending</i>
+                          <i>—</i>
                         )}
                       </td>
                       <td>
-                        <ul>
-                          {response.answers.map((ans, i) => (
-                            <li key={i}>
-                              {ans.startsWith("http") ? (
-                                <a href={ans} target="_blank" rel="noreferrer">View File</a>
-                              ) : (
-                                ans
-                              )}
-                            </li>
-                          ))}
-                        </ul>
+                        {response ? (
+                          <>
+                            <ul>
+                              {response.answers.map((ans, i) => (
+                                <li key={i}>
+                                  {ans.startsWith("http") ? (
+                                    <a href={ans} target="_blank" rel="noreferrer">View</a>
+                                  ) : (
+                                    ans
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
 
-                        <button
-                          style={{ marginTop: "5px", color: "red" }}
-                          onClick={async () => {
-                            if (window.confirm("Are you sure you want to delete this response?")) {
-                              try {
-                                await axios.post(
-                                  `http://localhost:5000/recruiter/interview/${interview._id}/delete-response`,
-                                  { candidateId: response.candidate?._id },
-                                  { withCredentials: true }
-                                );
-                                alert("Response deleted.");
-                                fetchResults(); // Refresh the list
-                              } catch (err) {
-                                alert("Error deleting response.");
-                                console.error(err);
-                              }
-                            }
-                          }}
-                        >
-                          Delete Response
-                        </button>
-                        
+                            <button
+                              style={{ marginTop: "5px", color: "red" }}
+                              onClick={async () => {
+                                if (window.confirm("Are you sure you want to delete this response?")) {
+                                  try {
+                                    await axios.post(
+                                      `http://localhost:5000/recruiter/interview/${interview._id}/delete-response`,
+                                      { candidateId: response.candidate._id },
+                                      { withCredentials: true }
+                                    );
+                                    alert("Response deleted.");
+                                    fetchResults(); // Refresh results
+                                  } catch (err) {
+                                    alert("Error deleting response.");
+                                    console.error(err);
+                                  }
+                                }
+                              }}
+                            >
+                              Delete Response
+                            </button>
+                          </>
+                        ) : <i>—</i>}
+                      </td>
+                      <td>
+                        <Link to={`/recruiter/candidate-details/${interview._id}/${candidate._id}`}>
+                          View Details
+                        </Link>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                  );
+                })}
+              </tbody>
+            </table>
+
             <hr />
           </div>
         ))
