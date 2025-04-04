@@ -1,274 +1,297 @@
 //---------------------
-//---------------------this is models/interview.js
-
+//---------------------this is models/Candidate.js
 const mongoose = require("mongoose");
 
-const InterviewSchema = new mongoose.Schema({
-  recruiterId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  scheduled_date: { type: Date, required: true },
-  candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  questions: [
+const CandidateSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Ref to User schema
+  interviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Interview" }], // Ref to Interview schema
+  roleApplied: {
+    type: String, // roles applied
+    default: [],
+  },
+
+  skills: {
+    type: [String], // Array of skills
+    default: [],
+  },
+
+  introduction: {
+    type: String, // A brief description by the candidate
+    default: "",
+  },
+
+  education: [
     {
-      questionText: String,
-      answerType: { type: String, enum: ["text", "file", "recording"], required: true },
-    }
+      degree: { type: String, required: true }, // Degree name
+      institution: { type: String, required: true }, // Institution name
+      yearOfCompletion: { type: Number, required: true }, // Year of completion
+    },
   ],
-  responses: [
-    {
-      candidate: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      answers: [String],
-      videoMarks: [Number], // ✅ Store individual video marks
-      marks: { type: Number, default: null } // ✅ Store average mark
-    }
-  ],
-  createdAt: { type: Date, default: Date.now },
-  answerDuration: { type: Number, default: 60 },
+
+  contactNumber: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        // Basic regex to validate phone number format (e.g., +60123456789)
+        return /^\+?[0-9]{10,15}$/.test(v);
+      },
+      message: (props) => `${props.value} is not a valid contact number!`,
+    },
+    required: [true, "Contact number is required"],
+  },
+
 });
 
-module.exports = mongoose.model("Interview", InterviewSchema);
+module.exports = mongoose.model("Candidate", CandidateSchema);
 
-//----------------------------------
-//---------------------------------this is src/pages/candidate/CandidateInterviews.jsx
 
+//----------------------------
+//----------------------------this is part of code of routes/candidate.js
+
+//---------------profile pages------------------//
+// ✅ Get Candidate Profile
+router.get("/profile", async (req, res) => {
+  try {
+    const candidate = await User.findById(req.user.id);
+    res.json({ candidate });
+  } catch (error) {
+    console.error("❌ Error loading profile:", error.message);
+    res.status(500).json({ message: "Error loading profile" });
+  }
+});
+
+// ✅ Update Profile
+router.post("/profile/edit", async (req, res) => {
+  const { name, email } = req.body;
+  try {
+    await User.findByIdAndUpdate(req.user.id, { name, email });
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating profile" });
+  }
+});
+
+
+//-----------------------
+//-----------------------this is pages/candidate/CandidateEditProfile.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-const CandidateInterviews = () => {
-  const [interviews, setInterviews] = useState([]);
-  const [loading, setLoading] = useState(true);
+const CandidateProfile = () => {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    currentPassword: "",
+    newPassword: "",
+  });
 
-  // ✅ Fetch assigned interviews on load
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
+
+  // ✅ Fetch current candidate profile data
   useEffect(() => {
-    const fetchInterviews = async () => {
+    const fetchProfile = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/candidate/interviews",
-          { withCredentials: true }
-        );
-        setInterviews(res.data.interviews);
-        setLoading(false);
-      } catch (error) {
-        console.error("❌ Error fetching interviews:", error.message);
-        setLoading(false);
+        const res = await axios.get("http://localhost:5000/candidate/profile", {
+          withCredentials: true,
+        });
+        if (res.data.candidate) {
+          setForm({
+            name: res.data.candidate.name,
+            email: res.data.candidate.email,
+            currentPassword: "",
+            newPassword: "",
+          });
+        }
+      } catch (err) {
+        console.error("Error loading profile:", err);
+        setError("Failed to load profile.");
       }
     };
 
-    fetchInterviews();
+    fetchProfile();
   }, []);
 
-  if (loading) {
-    return <p>Loading interviews...</p>;
-  }
+  // ✅ Handle input changes
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // ✅ Handle profile update
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/candidate/profile/edit",
+        {
+          name: form.name,
+          email: form.email,
+        },
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        setSuccess("Profile updated successfully!");
+      }
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      setError("Failed to update profile.");
+    }
+  };
+
+  // ✅ Handle password change
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/candidate/profile/edit-password",
+        {
+          currentPassword: form.currentPassword,
+          newPassword: form.newPassword,
+        },
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        setSuccess("Password updated successfully!");
+        setForm({ ...form, currentPassword: "", newPassword: "" });
+      }
+    } catch (err) {
+      console.error("Error changing password:", err);
+      setError(
+        err.response?.data?.message || "Failed to change password. Try again."
+      );
+    }
+  };
+
+  // ✅ Handle navigation back to candidate dashboard
+  const handleBackToDashboard = () => {
+    navigate("/candidate");
+  };
 
   return (
-    <div className="container">
-      <h2>My Interviews</h2>
+    <div>
+      <h2>Edit Profile</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {success && <p style={{ color: "green" }}>{success}</p>}
 
-      <table border="1" className="interview-table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Recruiter</th>
-            <th>Scheduled Date</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {interviews.length === 0 ? (
-            <tr>
-              <td colSpan="5">No assigned interviews</td>
-            </tr>
-          ) : (
-            interviews.map((interview) => (
-              <tr key={interview._id}>
-                <td>{interview.title}</td>
-                <td>
-                  {interview.recruiterId.name} ({interview.recruiterId.email})
-                </td>
-                <td>{new Date(interview.scheduled_date).toLocaleString()}</td>
-                <td>
-                  {interview.alreadySubmitted ? (
-                    <span style={{ color: "green", fontWeight: "bold" }}>
-                      Submitted
-                    </span>
-                  ) : (
-                    <span style={{ color: "orange" }}>Pending</span>
-                  )}
-                </td>
-                <td>
-                  {interview.alreadySubmitted ? (
-                    <span style={{ color: "gray" }}>✔ Answered</span>
-                  ) : (
-                    <Link to={`/candidate/interview/${interview._id}`}>
-                      Answer Questions
-                    </Link>
-                  )}
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+      {/* ✅ Profile Update Form */}
+      <form onSubmit={handleProfileUpdate}>
+        <label>Name:</label>
+        <input
+          type="text"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          required
+        />
+        <br />
 
-      <Link to="/candidate" className="back-link">
-        ← Back to Dashboard
-      </Link>
+        <label>Email:</label>
+        <input
+          type="email"
+          name="email"
+          value={form.email}
+          onChange={handleChange}
+          required
+        />
+        <br />
+
+        <button type="submit">Update Profile</button>
+      </form>
+
+      <h3>Change Password</h3>
+      {/* ✅ Change Password Form */}
+      <form onSubmit={handlePasswordChange}>
+        <label>Current Password:</label>
+        <input
+          type="password"
+          name="currentPassword"
+          value={form.currentPassword}
+          onChange={handleChange}
+          required
+        />
+        <br />
+
+        <label>New Password:</label>
+        <input
+          type="password"
+          name="newPassword"
+          value={form.newPassword}
+          onChange={handleChange}
+          required
+        />
+        <br />
+
+        <button type="submit">Change Password</button>
+      </form>
+
+      <br />
+      <button onClick={handleBackToDashboard}>Back to Dashboard</button>
     </div>
   );
 };
 
-export default CandidateInterviews;
+export default CandidateProfile;
 
 
-//------------------------------------
-//------------------------------------this is part of routes/candidate.js
-//---------------answer pages------------------//
-// ✅ Get Assigned Interviews
-router.get("/interviews", async (req, res) => {
-  try {
-    const candidateId = new mongoose.Types.ObjectId(req.user.id);
 
-    const interviews = await Interview.find({ candidates: candidateId })
-      .populate("recruiterId", "name email")
-      .sort({ scheduled_date: -1 });
+//---------------------
+//---------------------this is pages/candidate/CandidateProfileDetails.jsx
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-    // ✅ Attach 'alreadySubmitted' flag for each interview
-    const interviewsWithSubmissionStatus = interviews.map((interview) => {
-      const alreadySubmitted = interview.responses.some(
-        (response) => response.candidate.toString() === candidateId.toString()
-      );
+const CandidateProfileDetails = () => {
+  const [candidate, setCandidate] = useState(null);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-      return {
-        ...interview.toObject(), // convert to plain object
-        alreadySubmitted,
-      };
-    });
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/candidate/profile", {
+          withCredentials: true,
+        });
 
-    res.json({ interviews: interviewsWithSubmissionStatus });
-  } catch (error) {
-    console.error("❌ Error fetching interviews:", error.message);
-    res.status(500).json({ message: "Error fetching interviews" });
-  }
-});
-
-
-// ✅ Get Interview Details and Questions
-router.get("/interview/:id", async (req, res) => {
-  try {
-    const interview = await Interview.findById(req.params.id);
-    if (!interview) return res.status(404).json({ message: "Interview not found" });
-    // const alreadySubmitted = interview.responses.some(
-    //   (res) => res.candidate.toString() === req.user.id
-    // );
-
-    res.json({ interview });
-  } catch (error) {
-    console.error("❌ Error fetching interview:", error.message);
-    res.status(500).json({ message: "Error fetching interview" });
-  }
-});
-
-
-// ✅ Submit Interview Answers
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "interview_responses",
-    resource_type: "auto",
-    format: async (req, file) => file.mimetype.split("/")[1],
-  },
-});
-
-const upload = multer({
-  storage,
-  limits: { fileSize: 200 * 1024 * 1024 }, // Allow up to 200MB file uploads
-});
-
-router.post("/interview/:id/submit", upload.array("fileAnswers", 5), async (req, res) => {
-  try {
-    const candidateId = req.user.id;
-    let processedAnswers = [];
-    let videoURLs = [];
-
-    // ✅ Check if the candidate has already submitted a response
-    const interview = await Interview.findById(req.params.id);
-    if (!interview) {
-      return res.status(404).json({ message: "Interview not found" });
-    }
-
-    const existingResponse = interview.responses.find(
-      (response) => response.candidate.toString() === candidateId
-    );
-
-    if (existingResponse) {
-      return res.status(400).json({ message: "You have already submitted answers for this interview." });
-    }
-
-    // ✅ Process file uploads
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        processedAnswers.push(file.path);
-      }
-    }
-
-    if (req.body.answers) {
-      for (const answer of req.body.answers) {
-        processedAnswers.push(answer);
-        if (answer.startsWith("http") && answer.includes("video/upload")) {
-          videoURLs.push(answer);
+        if (res.data.candidate) {
+          setCandidate(res.data.candidate);
         }
+      } catch (err) {
+        console.error("Error fetching candidate profile:", err);
+        setError("Failed to load profile.");
       }
-    }
-
-    // ✅ Save response with null marks initially
-    const newResponse = {
-      candidate: candidateId,
-      answers: processedAnswers,
-      videoMarks: [],
-      marks: null,
     };
 
-    interview.responses.push(newResponse);
-    await interview.save();
+    fetchProfile();
+  }, []);
 
-    // ✅ Analyze video responses
-    let videoMarks = [];
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (!candidate) return <p>Loading...</p>;
 
-    for (const url of videoURLs) {
-      try {
-        const aiRes = await axios.post("http://localhost:5001/analyze-video", { videoURL: url });
-        const { marks } = aiRes.data;
-        videoMarks.push(marks);
-      } catch (err) {
-        console.error("❌ AI error:", err.message);
-      }
-    }
+  return (
+    <div>
+      <h2>My Profile</h2>
+      <p><strong>Name:</strong> {candidate.name}</p>
+      <p><strong>Email:</strong> {candidate.email}</p>
 
-    // ✅ Calculate average mark
-    const avgMark = videoMarks.length > 0 ? Math.round(videoMarks.reduce((a, b) => a + b, 0) / videoMarks.length) : null;
+      <button onClick={() => navigate("/candidate/profile/edit")}>
+        Edit Profile
+      </button>
 
-    // ✅ Update response with marks
-    await Interview.findOneAndUpdate(
-      { _id: req.params.id, "responses.candidate": candidateId },
-      {
-        $set: {
-          "responses.$.videoMarks": videoMarks,
-          "responses.$.marks": avgMark,
-        },
-      },
-      { new: true }
-    );
+      <br />
+      <button onClick={() => navigate("/candidate")}>Back to Dashboard</button>
+    </div>
+  );
+};
 
-    res.json({ message: "Answers submitted successfully", avgMark });
-  } catch (error) {
-    console.error("❌ Error submitting answers:", error.message);
-    res.status(500).json({ message: "Error submitting answers" });
-  }
-});
-
-
+export default CandidateProfileDetails;
 

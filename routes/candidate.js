@@ -67,8 +67,15 @@ router.delete("/notifications/:id/delete", async (req, res) => {
 // ✅ Get Candidate Profile
 router.get("/profile", async (req, res) => {
   try {
-    const candidate = await User.findById(req.user.id);
-    res.json({ candidate });
+    const user = await User.findById(req.user.id).select("-password");
+    const candidateProfile = await Candidate.findOne({ userId: req.user.id });
+
+    res.json({
+      candidate: {
+        ...user.toObject(),
+        ...candidateProfile?.toObject(),
+      },
+    });
   } catch (error) {
     console.error("❌ Error loading profile:", error.message);
     res.status(500).json({ message: "Error loading profile" });
@@ -77,11 +84,35 @@ router.get("/profile", async (req, res) => {
 
 // ✅ Update Profile
 router.post("/profile/edit", async (req, res) => {
-  const { name, email } = req.body;
+  const {
+    name,
+    email,
+    roleApplied,
+    skills,
+    introduction,
+    education,
+    contactNumber,
+  } = req.body;
+
   try {
     await User.findByIdAndUpdate(req.user.id, { name, email });
+
+    let candidate = await Candidate.findOne({ userId: req.user.id });
+    if (!candidate) {
+      candidate = new Candidate({ userId: req.user.id });
+    }
+
+    candidate.roleApplied = roleApplied;
+    candidate.skills = skills;
+    candidate.introduction = introduction;
+    candidate.education = education;
+    candidate.contactNumber = contactNumber;
+
+    await candidate.save();
+
     res.status(200).json({ message: "Profile updated successfully" });
   } catch (error) {
+    console.error("❌ Error updating profile:", error.message);
     res.status(500).json({ message: "Error updating profile" });
   }
 });

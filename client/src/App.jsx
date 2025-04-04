@@ -20,7 +20,8 @@ import CandidateDashboard from "./pages/candidate/CandidateDashboard";
 import CandidateInterviews from "./pages/candidate/CandidateInterviews"; 
 import CandidateNotificationDetails from "./pages/candidate/CandidateNotificationDetails";
 import CandidateAnswer from "./pages/candidate/CandidateAnswer";
-import CandidateProfile from "./pages/candidate/CandidateProfile";
+import CandidateProfileDetails from "./pages/candidate/CandidateProfileDetails";
+import CandidateEditProfile from "./pages/candidate/CandidateEditProfile";
 import CandidateInterviewDetails from "./pages/candidate/CandidateInterviewDetails";
 import CandidateInterviewResults from "./pages/candidate/CandidateInterviewResults";
 
@@ -49,9 +50,11 @@ function App() {
         <Route path="/candidate/interviews" element={<CandidateInterviews />} /> 
         <Route path="/candidate/notifications/:id" element={<CandidateNotificationDetails />} />
         <Route path="/candidate/interview/:id" element={<CandidateAnswer />} />
-        <Route path="/candidate/profile" element={<CandidateProfile />} />
+        <Route path="/candidate/profile" element={<CandidateProfileDetails />} />
+        <Route path="/candidate/profile/edit" element={<CandidateEditProfile />} />
         <Route path="/candidate/interview-details/:id" element={<CandidateInterviewDetails />} />
         <Route path="/candidate/interview/:id/results" element={<CandidateInterviewResults />} />
+
 
 
       </Routes>
