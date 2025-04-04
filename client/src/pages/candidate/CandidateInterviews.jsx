@@ -41,6 +41,7 @@ const CandidateInterviews = () => {
             <th>Scheduled Date</th>
             <th>Status</th>
             <th>Actions</th>
+            <th>Results</th>
           </tr>
         </thead>
         <tbody>
@@ -71,6 +72,15 @@ const CandidateInterviews = () => {
                     <Link to={`/candidate/interview-details/${interview._id}`}>
                       View Details
                     </Link>
+                </td>
+                <td>
+                  {interview.alreadySubmitted ? (
+                    <Link to={`/candidate/interview/${interview._id}/results`}>
+                      View Results
+                    </Link>
+                  ) : (
+                    "-"
+                  )}
                 </td>
               </tr>
             ))
