@@ -4,6 +4,7 @@ const Notification = require("../models/Notification");
 const Interview = require("../models/Interview");
 const User = require("../models/User");
 const Candidate = require("../models/candidate");
+const Recruiter = require("../models/Recruiter"); 
 const mongoose = require("mongoose");
 
 const router = express.Router();
@@ -316,6 +317,38 @@ router.post("/interview/:interviewId/delete-response", async (req, res) => {
   }
 });
 
+//---------------Profile------------------//
+// ✅ Get Recruiter Profile
+router.get("/profile", async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    const recruiter = await Recruiter.findOne({ userId: req.user.id });
+
+    if (!user || !recruiter) {
+      return res.status(404).json({ message: "Recruiter not found" });
+    }
+
+    res.json({ user, recruiter });
+  } catch (error) {
+    console.error("❌ Error loading recruiter profile:", error.message);
+    res.status(500).json({ message: "Error loading recruiter profile" });
+  }
+});
+
+// ✅ Edit Recruiter Profile
+router.post("/profile/edit", async (req, res) => {
+  const { name, email, contactNumber, jobTitle } = req.body;
+
+  try {
+    await User.findByIdAndUpdate(req.user.id, { name, email });
+    await Recruiter.findOneAndUpdate({ userId: req.user.id }, { contactNumber, jobTitle });
+
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    console.error("❌ Error updating recruiter profile:", error.message);
+    res.status(500).json({ message: "Error updating profile" });
+  }
+});
 
 
 module.exports = router;
