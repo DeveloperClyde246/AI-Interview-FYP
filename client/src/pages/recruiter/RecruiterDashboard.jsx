@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import RecruiterNavbar from "../components/RecruiterNavbar"; 
+
 
 const RecruiterDashboard = () => {
   const [data, setData] = useState({
@@ -53,6 +55,7 @@ const RecruiterDashboard = () => {
 
   return (
     <div>
+      <RecruiterNavbar />
       <h2>Recruiter Dashboard</h2>
       <p>Welcome, {username || "Loading..."}</p>
 

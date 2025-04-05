@@ -30,6 +30,7 @@ const CandidateChangePassword = () => {
       if (res.status === 200) {
         setSuccess("Password updated successfully!");
         setForm({ currentPassword: "", newPassword: "" });
+        navigate("/candidate/profile")
       }
     } catch (err) {
       console.error("Error changing password:", err);
