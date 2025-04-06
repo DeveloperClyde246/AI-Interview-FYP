@@ -13,6 +13,16 @@ const Candidate = require("../models/candidate");
 
 const router = express.Router();
 
+//convert to mp4
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+ffmpeg.setFfmpegPath(ffmpegPath);
+const FormData = require("form-data");
+const fs = require('fs');
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');
+
+
 // Ensure only candidates can access these routes
 router.use(authMiddleware(["candidate"]));
 
@@ -239,7 +249,8 @@ router.get("/interview/:id/results", async (req, res) => {
   }
 });
 
-// ✅ Submit Interview Answers
+
+// ✅ Submit Interview Answers setup
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -254,6 +265,7 @@ const upload = multer({
   limits: { fileSize: 200 * 1024 * 1024 }, // Allow up to 200MB file uploads
 });
 
+// ✅ Submit Interview Answers
 router.post("/interview/:id/submit", upload.array("fileAnswers", 5), async (req, res) => {
   try {
     const candidateId = req.user.id;
@@ -284,8 +296,14 @@ router.post("/interview/:id/submit", upload.array("fileAnswers", 5), async (req,
     if (req.body.answers) {
       for (const answer of req.body.answers) {
         processedAnswers.push(answer);
+    
         if (answer.startsWith("http") && answer.includes("video/upload")) {
-          videoURLs.push(answer);
+          // Convert to mp4 via Cloudinary transformation
+          const mp4URL = answer
+            .replace("/upload/", "/upload/f_mp4/")
+            .replace(".webm", ".mp4"); // Optional, just for consistency
+    
+          videoURLs.push(mp4URL);
         }
       }
     }
@@ -310,13 +328,53 @@ router.post("/interview/:id/submit", upload.array("fileAnswers", 5), async (req,
     // ✅ Analyze video responses
     let videoMarks = [];
 
+
+    const tempDir = path.join(__dirname, "../temp");
+    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
+
     for (const url of videoURLs) {
       try {
-        const aiRes = await axios.post("http://localhost:5001/analyze-video", { videoURL: url });
+        // 1. Download the webm video
+        const tempWebmPath = path.join(__dirname, "../temp", `${uuidv4()}.webm`);
+        const writer = fs.createWriteStream(tempWebmPath);
+        const videoStream = await axios.get(url, { responseType: "stream" });
+        await new Promise((resolve, reject) => {
+          videoStream.data.pipe(writer);
+          writer.on("finish", resolve);
+          writer.on("error", reject);
+        });
+    
+        // 2. Convert to MP4
+        const tempMp4Path = tempWebmPath.replace(".webm", ".mp4");
+        await new Promise((resolve, reject) => {
+          ffmpeg(tempWebmPath)
+            .output(tempMp4Path)
+            .on("end", resolve)
+            .on("error", reject)
+            .run();
+        });
+        
+        const form = new FormData();
+        form.append("video", fs.createReadStream(tempMp4Path));
+
+        const aiRes = await axios.post("http://localhost:5001/analyze-video", form, {
+          headers: form.getHeaders(),
+          timeout: 600000,
+        });
+        // // 3. Send to Flask AI API
+        // const aiRes = await axios.post("http://localhost:5001/analyze-video", {
+        //   videoURL: `file://${tempMp4Path}`, // or use fs.readFile if API accepts buffer
+        // }, { timeout: 60000 });
+    
         const { marks } = aiRes.data;
         videoMarks.push(marks);
+    
+        // 4. Cleanup temp files
+        fs.unlinkSync(tempWebmPath);
+        fs.unlinkSync(tempMp4Path);
+    
       } catch (err) {
-        console.error("❌ AI error:", err.message);
+        console.error("❌ AI error or FFmpeg error:", err.message);
       }
     }
 

@@ -128,7 +128,6 @@ const CreateInterview = () => {
               onChange={(e) => handleQuestionChange(index, "answerType", e.target.value)}
             >
               <option value="text">Text-Based Answer</option>
-              <option value="file">File Upload</option>
               <option value="recording">Recording on Portal</option>
             </select>
             <label>

@@ -1,143 +1,261 @@
-make recruiter navigation bar
+remove recruiter option to create question type upload file
+
+//---------------------this is recruiter.js
+
+// ✅ Create new interview
+router.post("/create-interview", async (req, res) => {
+  const { title, description, scheduled_date, questions, answerDuration, candidateIds } = req.body;
+  const recruiterId = req.user.id;
+
+  try {
+    // ✅ Validate if questions is an array of objects
+    if (!Array.isArray(questions) || questions.some(q => typeof q !== "object" || !q.questionText)) {
+      return res.status(400).json({ message: "Invalid questions format" });
+    }
+
+    // ✅ Map questions correctly
+    const formattedQuestions = questions.map((q) => ({
+      questionText: q.questionText,
+      answerType: q.answerType || "text",
+      recordingRequired: q.recordingRequired || false,
+    }));
+
+    console.log("Received Scheduled Date:", scheduled_date);
+    console.log("Scheduled Date (Parsed):", new Date(scheduled_date));
+
+    const parsedDate = new Date(scheduled_date);
+    //const localDate = new Date(parsedDate.getTime() - parsedDate.getTimezoneOffset() * 60000); 
+
+    // ✅ Create new interview with formatted questions
+    const interview = new Interview({
+      recruiterId,
+      title,
+      description,
+      scheduled_date: parsedDate,
+      answerDuration: answerDuration || 60, 
+      questions: formattedQuestions,
+      candidates: candidateIds ? candidateIds.map((id) => new mongoose.Types.ObjectId(id)) : [],
+    });
+
+    await interview.save();
+    res.status(201).json({ message: "Interview created successfully" });
+  } catch (error) {
+    console.error("❌ Error creating interview:", error.message);
+    res.status(500).json({ message: "Error creating interview" });
+  }
+});
 
 
-routes:
-        <Route path="/recruiter" element={<RecruiterDashboard />} />
-        <Route path="/recruiter/interviews" element={<RecruiterInterviews />} />
-        <Route path="/recruiter/interview/:id" element={<RecruiterInterviewDetails />} />
-        <Route path="/recruiter/interview-results" element={<RecruiterInterviewResults />} />
-        <Route path="/recruiter/notifications/:id" element={<NotificationDetails />} />
-        <Route path="/recruiter/create-interview" element={<CreateInterview />} />
-        <Route path="/recruiter/candidate-details/:interviewId/:candidateId" element={<RecruiterCandidateDetails />}/>
-        <Route path="/recruiter/interview/:id/edit-form" element={<RecruiterInterviewEdit />} />
-        <Route path="/recruiter/interview/:id/manage-candidates" element={<RecruiterManageCandidate />} />
-        <Route path="/recruiter/profile" element={<RecruiterProfileDetails />} />
-        <Route path="/recruiter/profile/edit" element={<RecruiterEditProfile />} />
 
-//------------------this is RecruiterDashboard.jsx
+//----------------------this is recruiter/CreateInterview.jsx
 
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const RecruiterDashboard = () => {
-  const [data, setData] = useState({
-    username: "",
-    notifications: [],
-    interviews: [],
-  });
-  const [error, setError] = useState("");
+const CreateInterview = () => {
+    const [candidates, setCandidates] = useState([]);
+    const [form, setForm] = useState({
+        title: "",
+        description: "",
+        scheduled_date: "",
+        questions: [{ questionText: "", answerType: "text", recordingRequired: false }],
+        candidateIds: [],
+        answerDuration: 60, // Default duration in seconds
+    });
 
-  const navigate = useNavigate(); // ✅ Add useNavigate for redirection
+    const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const res = await axios.get("http://localhost:5000/recruiter", {
-          withCredentials: true,
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchCandidates = async () => {
+        const res = await axios.get("http://localhost:5000/recruiter/create-interview", {
+            withCredentials: true,
         });
-        setData(res.data);
-      } catch (err) {
-        console.error("Error fetching dashboard:", err);
-        setError("Failed to load dashboard.");
-      }
+        setCandidates(res.data.candidates);
+        };
+        fetchCandidates();
+    }, []);
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    fetchDashboard();
-  }, []);
+    const handleQuestionChange = (index, key, value) => {
+        const updatedQuestions = [...form.questions];
+        updatedQuestions[index][key] = value;
+        setForm({ ...form, questions: updatedQuestions });
+    };
 
-  const { username, notifications, interviews } = data;
+    const addQuestion = () => {
+        setForm({
+        ...form,
+        questions: [
+            ...form.questions,
+            { questionText: "", answerType: "text", recordingRequired: false },
+        ],
+        });
+    };
+    
+    
+    // const formatDateForBackend = (datetime) => {
+    //     const date = new Date(datetime);
+    //     return date.toISOString(); // Converts it to a format that MongoDB will recognize
+    //   };
 
-  // ✅ Handle logout and redirect to login
-  const handleLogout = async () => {
-    try {
-      const res = await axios.get(
-        "http://localhost:5000/auth/logout",
-        {},
-        { withCredentials: true }
-      );
 
-      if (res.status === 200) {
-        alert("Logout successful!");
-        navigate("/login"); // ✅ Redirect to login after successful logout
-      } else {
-        alert("Logout failed. Please try again.");
-      }
-    } catch (err) {
-      console.error("Error during logout:", err);
-      alert("Error logging out. Please try again.");
-    }
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+    
+        try {
+            // const formattedForm = {
+            //     ...form,
+            //     scheduled_date: formatDateForBackend(form.scheduled_date), // ✅ Format date before sending
+            //     };
+
+            await axios.post("http://localhost:5000/recruiter/create-interview", form, {
+                withCredentials: true,
+            });
+        navigate("/recruiter/interviews");
+        } catch (err) {
+        if (err.response && err.response.status === 400) {
+            setError(err.response.data.message);
+        } else {
+            setError("Error creating interview.");
+        }
+        }
+      };
+
+
+  // ✅ Get current datetime in the correct format for datetime-local input
+    const getCurrentDateTime = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        const day = String(now.getDate()).padStart(2, "0");
+        const hours = String(now.getHours()).padStart(2, "0");
+        const minutes = String(now.getMinutes()).padStart(2, "0");
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+
 
   return (
     <div>
-      <h2>Recruiter Dashboard</h2>
-      <p>Welcome, {username || "Loading..."}</p>
+      <h2>Create New Interview</h2>
+      <form onSubmit={handleSubmit}>
+        <label>Interview Title:</label>
+        <input type="text" name="title" value={form.title} onChange={handleChange} required />
 
-      <h3>Notifications</h3>
-      <ul>
-        {notifications.length === 0 ? (
-          <li>No new notifications</li>
-        ) : (
-          notifications.map((n) => (
-            <li key={n._id}>
-              <Link to={`notifications/${n._id}`}>
-                {n.message} - {n.status === "unread" ? "🔔" : "✅"}
-              </Link>
-            </li>
-          ))
-        )}
-      </ul>
+        <label>Interview Description:</label>
+        <textarea name="description" value={form.description} onChange={handleChange} required />
 
-      <h3>Your Scheduled Interviews</h3>
-      <table border="1" cellPadding="5">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Candidate</th>
-            <th>Scheduled Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {interviews.length === 0 ? (
-            <tr>
-              <td colSpan="4">No scheduled interviews</td>
-            </tr>
-          ) : (
-            interviews.map((interview) => (
-              <tr key={interview._id}>
-                <td>{interview.title}</td>
-                <td>
-                  {interview.candidates.length > 0 ? (
-                    interview.candidates.map((candidate) => (
-                      <div key={candidate._id}>
-                        {candidate.name} ({candidate.email})
-                      </div>
-                    ))
-                  ) : (
-                    "No candidates assigned"
-                  )}
-                </td>
-                <td>
-                  {interview.scheduled_date
-                    ? new Date(interview.scheduled_date).toLocaleString()
-                    : "Not Scheduled"}
-                </td>
-                <td>{interview.status || "Pending"}</td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+        <label>Scheduled Date:</label>
+        <input type="datetime-local" name="scheduled_date" value={form.scheduled_date} min={getCurrentDateTime()} onChange={handleChange} required />
 
-      <br />
-      {/* ✅ Replaced <a> with button to trigger handleLogout */}
-      <button onClick={handleLogout}>Logout</button>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+        <label>Answer Duration (seconds):</label>
+        <input
+          type="number"
+          name="answerDuration"
+          value={form.answerDuration}
+          onChange={handleChange}
+          min="1"
+          required
+        />
+
+        <h3>Interview Questions</h3>
+        {form.questions.map((q, index) => (
+          <div key={index}>
+            <input
+              type="text"
+              placeholder="Enter question"
+              value={q.questionText}
+              onChange={(e) => handleQuestionChange(index, "questionText", e.target.value)}
+              required
+            />
+            <select
+              value={q.answerType}
+              onChange={(e) => handleQuestionChange(index, "answerType", e.target.value)}
+            >
+              <option value="text">Text-Based Answer</option>
+              <option value="file">File Upload</option>
+              <option value="recording">Recording on Portal</option>
+            </select>
+            <label>
+              <input
+                type="checkbox"
+                checked={q.recordingRequired}
+                onChange={(e) =>
+                  handleQuestionChange(index, "recordingRequired", e.target.checked)
+                }
+              />
+              Requires Answer
+            </label>
+          </div>
+        ))}
+        <button type="button" onClick={addQuestion}>
+          ➕ Add Another Question
+        </button>
+
+        <h3>Select Candidates</h3>
+        {candidates.map((c) => (
+          <div key={c._id}>
+            <input
+              type="checkbox"
+              value={c._id}
+              checked={form.candidateIds.includes(c._id)}
+              onChange={(e) => {
+                const isChecked = e.target.checked;
+                setForm({
+                  ...form,
+                  candidateIds: isChecked
+                    ? [...form.candidateIds, c._id]
+                    : form.candidateIds.filter((id) => id !== c._id),
+                });
+              }}
+            />
+            {c.name} ({c.email})
+          </div>
+        ))}
+
+        <button type="submit">Create Interview</button>
+      </form>
     </div>
   );
 };
 
-export default RecruiterDashboard;
+export default CreateInterview;
 
+
+//------------------------------this is models/Interview.js
+
+const mongoose = require("mongoose");
+
+const InterviewSchema = new mongoose.Schema({
+  recruiterId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  scheduled_date: { type: Date, required: true },
+  candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  questions: [
+    {
+      questionText: String,
+      answerType: { type: String, enum: ["text", "file", "recording"], required: true },
+    }
+  ],
+  responses: [
+    {
+      candidate: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      answers: [String],
+      videoMarks: [Number], // ✅ Store individual video marks
+      marks: { type: Number, default: null } ,// ✅ Store average mark
+      status: { type: String, enum: ["pending", "submitted", "submitted late"], default: "pending" },
+      submitDateTime: { type: Date }
+    }
+  ],
+  createdAt: { type: Date, default: Date.now },
+  answerDuration: { type: Number, default: 60 },
+});
+
+module.exports = mongoose.model("Interview", InterviewSchema);
