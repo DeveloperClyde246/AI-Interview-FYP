@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import RecruiterNavbar from "../components/RecruiterNavbar";
 
 const CreateInterview = () => {
     const [candidates, setCandidates] = useState([]);
@@ -92,6 +93,7 @@ const CreateInterview = () => {
 
   return (
     <div>
+      <RecruiterNavbar />
       <h2>Create New Interview</h2>
       <form onSubmit={handleSubmit}>
         <label>Interview Title:</label>

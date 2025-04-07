@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import CandidateNavbar from "../components/CandidateNavbar";
 
 const CandidateEditProfile = () => {
   const [form, setForm] = useState({
@@ -127,6 +128,7 @@ const CandidateEditProfile = () => {
 
   return (
     <div>
+      <CandidateNavbar />
       <h2>Edit Profile</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {success && <p style={{ color: "green" }}>{success}</p>}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import RecruiterNavbar from "../components/RecruiterNavbar"; 
 
 const RecruiterInterviewEdit = () => {
   const { id } = useParams();
@@ -75,6 +76,7 @@ const RecruiterInterviewEdit = () => {
 
   return (
     <div>
+      <RecruiterNavbar />
       <h2>Edit Interview Details</h2>
       <form onSubmit={handleEditInterview}>
         <label>Interview Title:</label>

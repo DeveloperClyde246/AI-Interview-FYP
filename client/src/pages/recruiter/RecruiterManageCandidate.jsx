@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
+import RecruiterNavbar from "../components/RecruiterNavbar"; 
 
 const RecruiterManageCandidate = () => {
   const { id } = useParams();
@@ -68,6 +69,7 @@ const RecruiterManageCandidate = () => {
 
   return (
     <div>
+      <RecruiterNavbar />
       <h2>Manage Candidates for: {interview.title}</h2>
 
       <h3>Assigned Candidates</h3>

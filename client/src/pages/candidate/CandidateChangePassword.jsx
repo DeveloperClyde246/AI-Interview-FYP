@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import CandidateNavbar from "../components/CandidateNavbar";
 
 const CandidateChangePassword = () => {
   const [form, setForm] = useState({
@@ -42,6 +43,7 @@ const CandidateChangePassword = () => {
 
   return (
     <div>
+      <CandidateNavbar />
       <h2>Change Password</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {success && <p style={{ color: "green" }}>{success}</p>}

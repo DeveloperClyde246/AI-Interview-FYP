@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import CandidateNavbar from "../components/CandidateNavbar";
 
 const CandidateProfileDetails = () => {
   const [candidate, setCandidate] = useState(null);
@@ -31,6 +32,7 @@ const CandidateProfileDetails = () => {
 
   return (
     <div>
+      <CandidateNavbar />
       <h2>My Profile</h2>
 
       <p><strong>Name:</strong> {candidate.name}</p>

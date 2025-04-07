@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import RecruiterNavbar from "../components/RecruiterNavbar"; 
 
 const RecruiterProfileDetails = () => {
   const [user, setUser] = useState(null);
@@ -27,6 +28,7 @@ const RecruiterProfileDetails = () => {
 
   return (
     <div>
+      <RecruiterNavbar />
       <h2>Recruiter Profile</h2>
       <p><strong>Name:</strong> {user.name}</p>
       <p><strong>Email:</strong> {user.email}</p>

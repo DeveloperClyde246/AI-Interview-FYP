@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import RecruiterNavbar from "../components/RecruiterNavbar"; 
 
 const RecruiterInterviews = () => {
   const [interviews, setInterviews] = useState([]);
@@ -40,6 +41,7 @@ const RecruiterInterviews = () => {
 
   return (
     <div>
+      <RecruiterNavbar />
       <h2>My Interviews</h2>
 
       <table border="1">

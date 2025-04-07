@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import RecruiterNavbar from "../components/RecruiterNavbar"; 
 
 const RecruiterInterviewResults = () => {
   const [interviews, setInterviews] = useState([]);
@@ -24,6 +25,7 @@ const RecruiterInterviewResults = () => {
 
   return (
     <div>
+      <RecruiterNavbar />
       <h2>Interview Analysis Results</h2>
       {interviews.length === 0 ? (
         <p>No interviews found.</p>

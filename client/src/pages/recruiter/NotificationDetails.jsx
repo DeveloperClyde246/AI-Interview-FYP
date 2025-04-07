@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import RecruiterNavbar from "../components/RecruiterNavbar"; 
 
 const NotificationDetails = () => {
   const { id } = useParams();
@@ -70,6 +71,7 @@ const NotificationDetails = () => {
 
   return (
     <div>
+      <RecruiterNavbar />
       <h2>Notification Details</h2>
       <p>
         <strong>Message:</strong> {notification.message}

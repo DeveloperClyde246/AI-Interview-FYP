@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import RecruiterNavbar from "../components/RecruiterNavbar";
 
 const RecruiterEditProfile = () => {
   const [form, setForm] = useState({
@@ -58,6 +59,7 @@ const RecruiterEditProfile = () => {
 
   return (
     <div>
+      <RecruiterNavbar />
       <h2>Edit Recruiter Profile</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {success && <p style={{ color: "green" }}>{success}</p>}

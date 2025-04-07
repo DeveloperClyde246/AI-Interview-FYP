@@ -1,10 +1,11 @@
 import React from "react";
 import axios from "axios";
 import {  Link, useNavigate } from "react-router-dom";
+import CandidateNavbar from "../components/CandidateNavbar";
 
 const CandidateFAQ = () => {
     // ✅ Handle Logout
-      const navigate = useNavigate();
+    const navigate = useNavigate();
 
     const handleLogout = async () => {
       try {
@@ -29,6 +30,7 @@ const CandidateFAQ = () => {
 
   return (
     <div>
+      <CandidateNavbar />
       <nav style={styles.navbar}>
         <Link to="/candidate" style={styles.navLink}>Dashboard</Link>
         <Link to="/candidate/interviews" style={styles.navLink}>Interviews</Link>

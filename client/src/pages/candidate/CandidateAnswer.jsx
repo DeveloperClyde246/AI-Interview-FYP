@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import CandidateNavbar from "../components/CandidateNavbar";
 
 const CandidateAnswer = () => {
   const { id } = useParams();
@@ -153,6 +154,7 @@ const CandidateAnswer = () => {
 
   return (
     <div>      
+      {/* <CandidateNavbar /> */}
       <h2>Answer Questions - {interview.title}</h2>
       <form id="answer-form" onSubmit={handleSubmit} encType="multipart/form-data">
         {interview.questions.map((question, index) => (

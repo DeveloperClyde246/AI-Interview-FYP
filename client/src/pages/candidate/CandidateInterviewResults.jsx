@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import CandidateNavbar from "../components/CandidateNavbar";
 
 const CandidateInterviewResults = () => {
   const { id } = useParams();
@@ -26,6 +27,7 @@ const CandidateInterviewResults = () => {
 
   return (
     <div>
+      <CandidateNavbar />
       <h2>Interview Results - {result.title}</h2>
       <p><strong>Recruiter:</strong> {result.recruiter.name} ({result.recruiter.email})</p>
       <p><strong>Status:</strong> {result.status}</p>
