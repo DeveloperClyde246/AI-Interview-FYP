@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import CandidateNavbar from "../components/CandidateNavbar";
 
 const CandidateDashboard = () => {
   const [username, setUsername] = useState("");
@@ -51,6 +52,8 @@ const CandidateDashboard = () => {
 
   return (
     <div>
+      <CandidateNavbar />
+
       <h2>Candidate Dashboard</h2>
       <p>Welcome, {username}!</p>
 
@@ -111,5 +114,7 @@ const CandidateDashboard = () => {
     </div>
   );
 };
+
+
 
 export default CandidateDashboard;

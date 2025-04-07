@@ -1,96 +1,261 @@
-//----------------------------------
-//---------------------------------this is views/candidate-answer.ejs
-<h2>Answer Questions - <%= interview.title %></h2>
+remove recruiter option to create question type upload file
 
-<form id="answer-form" action="/candidate/interview/<%= interview._id %>/submit" method="POST" enctype="multipart/form-data">
-  <% interview.questions.forEach((question, index) => { %>
-    <p><strong>Question <%= index + 1 %>:</strong> <%= question.questionText %></p>
+//---------------------this is recruiter.js
 
-    <% if (question.answerType === "text") { %>
-      <textarea name="answers[]" required></textarea>
-    <% } else if (question.answerType === "file") { %>
-      <input type="file" name="fileAnswers" accept="*/*">
-    <% } else if (question.answerType === "recording") { %>
-      <button type="button" onclick="startVideoRecording('<%= index %>')">Start Recording</button>
-      <button type="button" onclick="stopVideoRecording('<%= index %>')">Stop Recording</button>
-      <video id="video-preview-<%= index %>" controls></video>
-      <input type="hidden" name="answers[]" id="recorded-video-<%= index %>">
-    <% } %>
+// ✅ Create new interview
+router.post("/create-interview", async (req, res) => {
+  const { title, description, scheduled_date, questions, answerDuration, candidateIds } = req.body;
+  const recruiterId = req.user.id;
 
-<!-- TODO: only allow to record video once -->
+  try {
+    // ✅ Validate if questions is an array of objects
+    if (!Array.isArray(questions) || questions.some(q => typeof q !== "object" || !q.questionText)) {
+      return res.status(400).json({ message: "Invalid questions format" });
+    }
 
-    <hr>
-  <% }) %>
+    // ✅ Map questions correctly
+    const formattedQuestions = questions.map((q) => ({
+      questionText: q.questionText,
+      answerType: q.answerType || "text",
+      recordingRequired: q.recordingRequired || false,
+    }));
 
-  <button type="submit" id="submit-btn">Submit Answers</button>
-</form>
+    console.log("Received Scheduled Date:", scheduled_date);
+    console.log("Scheduled Date (Parsed):", new Date(scheduled_date));
 
-<a href="/candidate/interviews">Back to Interviews</a>
+    const parsedDate = new Date(scheduled_date);
+    //const localDate = new Date(parsedDate.getTime() - parsedDate.getTimezoneOffset() * 60000); 
 
-<script>
-  let mediaRecorder;
-  let recordedBlobs = [];
-  let isUploading = false;
-  let cloudinaryPreset = "interview_responses"; // Update this from Cloudinary settings
-  let cloudinaryUploadURL = "https://api.cloudinary.com/v1_1/dnxuioifx/video/upload"; // Replace with your Cloudinary name
+    // ✅ Create new interview with formatted questions
+    const interview = new Interview({
+      recruiterId,
+      title,
+      description,
+      scheduled_date: parsedDate,
+      answerDuration: answerDuration || 60, 
+      questions: formattedQuestions,
+      candidates: candidateIds ? candidateIds.map((id) => new mongoose.Types.ObjectId(id)) : [],
+    });
 
-  function startVideoRecording(index) {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        document.getElementById(`video-preview-${index}`).srcObject = stream;
-        mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
-        recordedBlobs = [];
-
-        mediaRecorder.ondataavailable = event => {
-          if (event.data.size > 0) recordedBlobs.push(event.data);
-        };
-
-        mediaRecorder.start();
-      })
-      .catch(error => console.error("❌ Error accessing camera:", error));
+    await interview.save();
+    res.status(201).json({ message: "Interview created successfully" });
+  } catch (error) {
+    console.error("❌ Error creating interview:", error.message);
+    res.status(500).json({ message: "Error creating interview" });
   }
+});
 
-  function stopVideoRecording(index) {
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
-      mediaRecorder.stop();
 
-      mediaRecorder.onstop = async () => {
-        const videoBlob = new Blob(recordedBlobs, { type: "video/webm" });
-        const videoUrl = URL.createObjectURL(videoBlob);
-        const videoPreview = document.getElementById(`video-preview-${index}`);
 
-        // ✅ Set video source to preview before uploading
-        videoPreview.srcObject = null;
-        videoPreview.src = videoUrl;
-        videoPreview.controls = true;
+//----------------------this is recruiter/CreateInterview.jsx
 
-        // ✅ Upload Video to Cloudinary
-        isUploading = true;
-        let formData = new FormData();
-        formData.append("file", videoBlob);
-        formData.append("upload_preset", cloudinaryPreset);
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
+const CreateInterview = () => {
+    const [candidates, setCandidates] = useState([]);
+    const [form, setForm] = useState({
+        title: "",
+        description: "",
+        scheduled_date: "",
+        questions: [{ questionText: "", answerType: "text", recordingRequired: false }],
+        candidateIds: [],
+        answerDuration: 60, // Default duration in seconds
+    });
+
+    const [error, setError] = useState("");
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchCandidates = async () => {
+        const res = await axios.get("http://localhost:5000/recruiter/create-interview", {
+            withCredentials: true,
+        });
+        setCandidates(res.data.candidates);
+        };
+        fetchCandidates();
+    }, []);
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleQuestionChange = (index, key, value) => {
+        const updatedQuestions = [...form.questions];
+        updatedQuestions[index][key] = value;
+        setForm({ ...form, questions: updatedQuestions });
+    };
+
+    const addQuestion = () => {
+        setForm({
+        ...form,
+        questions: [
+            ...form.questions,
+            { questionText: "", answerType: "text", recordingRequired: false },
+        ],
+        });
+    };
+    
+    
+    // const formatDateForBackend = (datetime) => {
+    //     const date = new Date(datetime);
+    //     return date.toISOString(); // Converts it to a format that MongoDB will recognize
+    //   };
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+    
         try {
-          let response = await fetch(cloudinaryUploadURL, {
-            method: "POST",
-            body: formData,
-          });
+            // const formattedForm = {
+            //     ...form,
+            //     scheduled_date: formatDateForBackend(form.scheduled_date), // ✅ Format date before sending
+            //     };
 
-          let data = await response.json();
-          document.getElementById(`recorded-video-${index}`).value = data.secure_url; // ✅ Store Cloudinary URL in form
-          isUploading = false;
-        } catch (error) {
-          console.error("❌ Error uploading video to Cloudinary:", error);
+            await axios.post("http://localhost:5000/recruiter/create-interview", form, {
+                withCredentials: true,
+            });
+        navigate("/recruiter/interviews");
+        } catch (err) {
+        if (err.response && err.response.status === 400) {
+            setError(err.response.data.message);
+        } else {
+            setError("Error creating interview.");
+        }
         }
       };
-    }
-  }
 
-  // ✅ Prevent Form Submission Until Cloudinary Upload Completes
-  document.getElementById("answer-form").addEventListener("submit", function (event) {
-    if (isUploading) {
-      event.preventDefault();
-      alert("Please wait for the video to finish uploading before submitting.");
+
+  // ✅ Get current datetime in the correct format for datetime-local input
+    const getCurrentDateTime = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        const day = String(now.getDate()).padStart(2, "0");
+        const hours = String(now.getHours()).padStart(2, "0");
+        const minutes = String(now.getMinutes()).padStart(2, "0");
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+
+
+  return (
+    <div>
+      <h2>Create New Interview</h2>
+      <form onSubmit={handleSubmit}>
+        <label>Interview Title:</label>
+        <input type="text" name="title" value={form.title} onChange={handleChange} required />
+
+        <label>Interview Description:</label>
+        <textarea name="description" value={form.description} onChange={handleChange} required />
+
+        <label>Scheduled Date:</label>
+        <input type="datetime-local" name="scheduled_date" value={form.scheduled_date} min={getCurrentDateTime()} onChange={handleChange} required />
+
+        <label>Answer Duration (seconds):</label>
+        <input
+          type="number"
+          name="answerDuration"
+          value={form.answerDuration}
+          onChange={handleChange}
+          min="1"
+          required
+        />
+
+        <h3>Interview Questions</h3>
+        {form.questions.map((q, index) => (
+          <div key={index}>
+            <input
+              type="text"
+              placeholder="Enter question"
+              value={q.questionText}
+              onChange={(e) => handleQuestionChange(index, "questionText", e.target.value)}
+              required
+            />
+            <select
+              value={q.answerType}
+              onChange={(e) => handleQuestionChange(index, "answerType", e.target.value)}
+            >
+              <option value="text">Text-Based Answer</option>
+              <option value="file">File Upload</option>
+              <option value="recording">Recording on Portal</option>
+            </select>
+            <label>
+              <input
+                type="checkbox"
+                checked={q.recordingRequired}
+                onChange={(e) =>
+                  handleQuestionChange(index, "recordingRequired", e.target.checked)
+                }
+              />
+              Requires Answer
+            </label>
+          </div>
+        ))}
+        <button type="button" onClick={addQuestion}>
+          ➕ Add Another Question
+        </button>
+
+        <h3>Select Candidates</h3>
+        {candidates.map((c) => (
+          <div key={c._id}>
+            <input
+              type="checkbox"
+              value={c._id}
+              checked={form.candidateIds.includes(c._id)}
+              onChange={(e) => {
+                const isChecked = e.target.checked;
+                setForm({
+                  ...form,
+                  candidateIds: isChecked
+                    ? [...form.candidateIds, c._id]
+                    : form.candidateIds.filter((id) => id !== c._id),
+                });
+              }}
+            />
+            {c.name} ({c.email})
+          </div>
+        ))}
+
+        <button type="submit">Create Interview</button>
+      </form>
+    </div>
+  );
+};
+
+export default CreateInterview;
+
+
+//------------------------------this is models/Interview.js
+
+const mongoose = require("mongoose");
+
+const InterviewSchema = new mongoose.Schema({
+  recruiterId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  scheduled_date: { type: Date, required: true },
+  candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  questions: [
+    {
+      questionText: String,
+      answerType: { type: String, enum: ["text", "file", "recording"], required: true },
     }
-  });
-</script>
+  ],
+  responses: [
+    {
+      candidate: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      answers: [String],
+      videoMarks: [Number], // ✅ Store individual video marks
+      marks: { type: Number, default: null } ,// ✅ Store average mark
+      status: { type: String, enum: ["pending", "submitted", "submitted late"], default: "pending" },
+      submitDateTime: { type: Date }
+    }
+  ],
+  createdAt: { type: Date, default: Date.now },
+  answerDuration: { type: Number, default: 60 },
+});
+
+module.exports = mongoose.model("Interview", InterviewSchema);

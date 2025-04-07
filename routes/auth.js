@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const Candidate = require("../models/candidate");
 
 const router = express.Router();
 
@@ -37,6 +38,18 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ name, email, password: hashedPassword, role });
     await newUser.save();
+
+    // ✅ Create candidate profile with default fields
+    if (role === "candidate") {
+      await Candidate.create({
+        userId: newUser._id,
+        roleApplied: "",
+        skills: [],
+        introduction: "",
+        education: [],
+        contactNumber: "+60123456789" // default valid contact
+      });
+    }
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {

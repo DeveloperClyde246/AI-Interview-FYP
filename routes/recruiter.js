@@ -3,6 +3,8 @@ const authMiddleware = require("../middleware/authMiddleware");
 const Notification = require("../models/Notification");
 const Interview = require("../models/Interview");
 const User = require("../models/User");
+const Candidate = require("../models/candidate");
+const Recruiter = require("../models/Recruiter"); 
 const mongoose = require("mongoose");
 
 const router = express.Router();
@@ -15,6 +17,7 @@ router.use(authMiddleware(["recruiter"]));
 // ✅ Recruiter Dashboard (GET all notifications + interviews)
 router.get("/", async (req, res) => {
   try {
+    console.log("📥 Recruiter dashboard accessed");
     const recruiterId = req.user.id;
 
     const now = new Date();
@@ -26,7 +29,8 @@ router.get("/", async (req, res) => {
     }).populate("candidates", "_id");
 
     for (const interview of upcomingInterviews) {
-      const recruiterMsg = `Reminder: You have an interview titled "${interview.title}" scheduled soon.`;
+      const formattedDate = new Date(interview.scheduled_date).toLocaleString();
+      const recruiterMsg = `You have an interview titled "${interview.title}" scheduled for ${formattedDate}.`;
 
       const recruiterNotification = await Notification.findOne({
         userId: recruiterId,
@@ -42,7 +46,7 @@ router.get("/", async (req, res) => {
       }
 
       for (const candidate of interview.candidates) {
-        const candidateMsg = `Reminder: You have an interview titled "${interview.title}" scheduled soon.`;
+        const candidateMsg = `You have an interview titled "${interview.title}" scheduled for ${formattedDate}.`;
 
         const existing = await Notification.findOne({
           userId: candidate._id,
@@ -113,14 +117,14 @@ router.post("/create-interview", async (req, res) => {
     console.log("Scheduled Date (Parsed):", new Date(scheduled_date));
 
     const parsedDate = new Date(scheduled_date);
-    const localDate = new Date(parsedDate.getTime() - parsedDate.getTimezoneOffset() * 60000); 
+    //const localDate = new Date(parsedDate.getTime() - parsedDate.getTimezoneOffset() * 60000); 
 
     // ✅ Create new interview with formatted questions
     const interview = new Interview({
       recruiterId,
       title,
       description,
-      scheduled_date: localDate,
+      scheduled_date: parsedDate,
       answerDuration: answerDuration || 60, 
       questions: formattedQuestions,
       candidates: candidateIds ? candidateIds.map((id) => new mongoose.Types.ObjectId(id)) : [],
@@ -247,6 +251,7 @@ router.get("/interview-results", async (req, res) => {
 
     const interviews = await Interview.find({ recruiterId })
       .populate("responses.candidate", "name email")
+      .populate("candidates", "name email")
       .sort({ createdAt: -1 });
 
     res.json({ interviews });
@@ -255,5 +260,95 @@ router.get("/interview-results", async (req, res) => {
     res.status(500).json({ message: "Error loading results" });
   }
 });
+
+
+// ✅ View candidate profile + response details
+router.get("/candidate-details/:interviewId/:candidateId", async (req, res) => {
+  const { interviewId, candidateId } = req.params;
+
+  try {
+    const interview = await Interview.findById(interviewId)
+      .populate("responses.candidate", "name email")
+      .populate("candidates", "_id"); // we will fetch full candidate info separately
+
+    if (!interview) return res.status(404).json({ message: "Interview not found" });
+
+    const response = interview.responses.find(
+      (r) => r.candidate?._id.toString() === candidateId
+    );
+
+    // ✅ Find candidate document from Candidate model
+    const candidateProfile = await Candidate.findOne({ userId: candidateId }).lean();
+    const userProfile = await User.findById(candidateId).lean();
+
+    if (!candidateProfile || !userProfile) {
+      return res.status(404).json({ message: "Candidate not found" });
+    }
+
+    const fullCandidate = {
+      ...userProfile,
+      ...candidateProfile
+    };
+
+    res.json({
+      candidate: fullCandidate,
+      response: response || null,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching candidate details:", error.message);
+    res.status(500).json({ message: "Error fetching candidate details" });
+  }
+});
+
+
+// ✅ Delete candidate response for an interview
+router.post("/interview/:interviewId/delete-response", async (req, res) => {
+  try {
+    const { candidateId } = req.body;
+
+    await Interview.findByIdAndUpdate(req.params.interviewId, {
+      $pull: { responses: { candidate: candidateId } },
+    });
+
+    res.json({ message: "Response deleted successfully" });
+  } catch (error) {
+    console.error("❌ Error deleting response:", error.message);
+    res.status(500).json({ message: "Error deleting response" });
+  }
+});
+
+//---------------Profile------------------//
+// ✅ Get Recruiter Profile
+router.get("/profile", async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    const recruiter = await Recruiter.findOne({ userId: req.user.id });
+
+    if (!user || !recruiter) {
+      return res.status(404).json({ message: "Recruiter not found" });
+    }
+
+    res.json({ user, recruiter });
+  } catch (error) {
+    console.error("❌ Error loading recruiter profile:", error.message);
+    res.status(500).json({ message: "Error loading recruiter profile" });
+  }
+});
+
+// ✅ Edit Recruiter Profile
+router.post("/profile/edit", async (req, res) => {
+  const { name, email, contactNumber, jobTitle } = req.body;
+
+  try {
+    await User.findByIdAndUpdate(req.user.id, { name, email });
+    await Recruiter.findOneAndUpdate({ userId: req.user.id }, { contactNumber, jobTitle });
+
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    console.error("❌ Error updating recruiter profile:", error.message);
+    res.status(500).json({ message: "Error updating profile" });
+  }
+});
+
 
 module.exports = router;

@@ -9,7 +9,7 @@ const InterviewSchema = new mongoose.Schema({
   questions: [
     {
       questionText: String,
-      answerType: { type: String, enum: ["text", "file", "recording"], required: true },
+      answerType: { type: String, enum: ["text", "recording"], required: true },
     }
   ],
   responses: [
@@ -17,7 +17,9 @@ const InterviewSchema = new mongoose.Schema({
       candidate: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
       answers: [String],
       videoMarks: [Number], // ✅ Store individual video marks
-      marks: { type: Number, default: null } // ✅ Store average mark
+      marks: { type: Number, default: null } ,// ✅ Store average mark
+      status: { type: String, enum: ["pending", "submitted", "submitted late"], default: "pending" },
+      submitDateTime: { type: Date }
     }
   ],
   createdAt: { type: Date, default: Date.now },

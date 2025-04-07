@@ -39,13 +39,15 @@ const CandidateInterviews = () => {
             <th>Title</th>
             <th>Recruiter</th>
             <th>Scheduled Date</th>
+            <th>Status</th>
             <th>Actions</th>
+            <th>Results</th>
           </tr>
         </thead>
         <tbody>
           {interviews.length === 0 ? (
             <tr>
-              <td colSpan="4">No assigned interviews</td>
+              <td colSpan="5">No assigned interviews</td>
             </tr>
           ) : (
             interviews.map((interview) => (
@@ -54,13 +56,31 @@ const CandidateInterviews = () => {
                 <td>
                   {interview.recruiterId.name} ({interview.recruiterId.email})
                 </td>
+                <td>{new Date(interview.scheduled_date).toLocaleString()}</td>
                 <td>
-                  {new Date(interview.scheduled_date).toLocaleString()}
+                  {interview.status === "submitted" && (
+                    <span style={{ color: "green", fontWeight: "bold" }}>Submitted</span>
+                  )}
+                  {interview.status === "submitted late" && (
+                    <span style={{ color: "orange", fontWeight: "bold" }}>Submitted Late</span>
+                  )}
+                  {interview.status === "pending" && (
+                    <span style={{ color: "gray" }}>Pending</span>
+                  )}
                 </td>
                 <td>
-                  <Link to={`/candidate/interview/${interview._id}`}>
-                    Answer Questions
-                  </Link>
+                    <Link to={`/candidate/interview-details/${interview._id}`}>
+                      View Details
+                    </Link>
+                </td>
+                <td>
+                  {interview.alreadySubmitted ? (
+                    <Link to={`/candidate/interview/${interview._id}/results`}>
+                      View Results
+                    </Link>
+                  ) : (
+                    "-"
+                  )}
                 </td>
               </tr>
             ))
@@ -69,7 +89,7 @@ const CandidateInterviews = () => {
       </table>
 
       <Link to="/candidate" className="back-link">
-        Back to Dashboard
+        ← Back to Dashboard
       </Link>
     </div>
   );

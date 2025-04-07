@@ -75,7 +75,7 @@ const NotificationDetails = () => {
         <strong>Message:</strong> {notification.message}
       </p>
       <p>
-        <strong>Created At:</strong> {new Date(notification.createdAt).toLocaleString()}
+        <strong>Notification created At:</strong> {new Date(notification.createdAt).toLocaleString()}
       </p>
 
       <button onClick={handleDelete} disabled={!deletable}>
