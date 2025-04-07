@@ -1,0 +1,95 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .edit-user-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #f4f7f9;
+  }
+  
+  .edit-user-card {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  .edit-user-card h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+  
+  .edit-user-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  .edit-user-form label {
+    font-weight: bold;
+    color: #555;
+    width: 100%;
+    max-width: 250px;
+  }
+  
+  .edit-user-form input{
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .edit-user-form select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 270px;
+  }
+  
+  .edit-user-form button.save-btn {
+    padding: 0.8rem 1.2rem;
+    font-size: 1.1rem;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100%;
+    min-width: 300px;
+  }
+  
+  .edit-user-form button.save-btn:hover {
+    background-color: #45a049;
+  }
+  
+  .back-btn {
+    margin-top: 1rem;
+    background-color: #555;
+    padding: 0.8rem 1.2rem;
+    font-size: 1.1rem;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    min-width: 300px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .back-btn:hover {
+    background-color: #333;
+  }
+  

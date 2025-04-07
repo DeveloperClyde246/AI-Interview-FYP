@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -10,15 +10,11 @@ const CandidateAnswer = () => {
   const [fileAnswers, setFileAnswers] = useState({});
   const [recordedVideos, setRecordedVideos] = useState({});
   const [isUploading, setIsUploading] = useState(false);
-  const [videoUploaded, setVideoUploaded] = useState(false); // ✅ Track if video is uploaded
+  const [videoUploaded, setVideoUploaded] = useState(false); 
   const [timeLeft, setTimeLeft] = useState(null);
   const [timerStarted, setTimerStarted] = useState(false);
   const cloudinaryPreset = "interview_responses"; // Update from Cloudinary settings
   const cloudinaryUploadURL = "https://api.cloudinary.com/v1_1/dnxuioifx/video/upload"; // Cloudinary Upload URL
-  const mediaRecorders = useRef({});
-  const recordedBlobMap = useRef({});
-  const streamMap = useRef({});
-
 
   useEffect(() => {
     const fetchInterviewDetails = async () => {
@@ -28,14 +24,6 @@ const CandidateAnswer = () => {
         });
         setInterview(res.data.interview);
         setAnswers(Array(res.data.interview.questions.length).fill(""));
-
-        // Start timer only once
-        if (!timerStarted) {
-          const durationInSeconds = res.data.interview.answerDuration * 60; // Convert minutes to seconds
-          setTimeLeft(durationInSeconds);
-          setTimerStarted(true);
-        }
-
       } catch (err) {
         console.error("Error fetching interview:", err);
         alert("Error loading interview details.");
@@ -44,21 +32,6 @@ const CandidateAnswer = () => {
 
     fetchInterviewDetails();
   }, [id]);
-
-  // ✅ Timer Logic
-  useEffect(() => {
-    if (!timerStarted || timeLeft === null) return;
-  
-    if (timeLeft === 0) {
-      alert("Time's up! Submitting your answers automatically.");
-      handleSubmit(new Event("submit")); // auto-submit
-      return;
-    }
-  
-    const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [timeLeft, timerStarted]);
-
 
   // ✅ Handle Text and File Changes
   const handleInputChange = (index, value) => {
@@ -82,19 +55,17 @@ const CandidateAnswer = () => {
       .then((stream) => {
         const videoPreview = document.getElementById(`video-preview-${index}`);
         videoPreview.srcObject = stream;
-        videoPreview.muted = true;
-        videoPreview.play();
-  
-        const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
-        recordedBlobMap.current[index] = [];
-  
-        recorder.ondataavailable = (event) => {
-          if (event.data.size > 0) recordedBlobMap.current[index].push(event.data);
+        videoPreview.muted = true; // ensures no feedback noise
+        videoPreview.play(); // Start playing live stream  
+        mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+        recordedBlobs = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) recordedBlobs.push(event.data);
         };
-  
-        recorder.start();
-        mediaRecorders.current[index] = recorder;
-        streamMap.current[index] = stream;
+
+        mediaRecorder.start();
+        isRecording = true;
       })
       .catch((error) => {
         console.error("❌ Error accessing camera:", error);
@@ -102,40 +73,34 @@ const CandidateAnswer = () => {
   };
 
   const stopVideoRecording = async (index) => {
-    const recorder = mediaRecorders.current[index];
-    const stream = streamMap.current[index];
-  
-    if (recorder && recorder.state !== "inactive") {
-      recorder.stop();
-  
-      recorder.onstop = async () => {
-        if (stream) {
-          stream.getTracks().forEach((track) => track.stop());
-        }
-  
-        const videoBlob = new Blob(recordedBlobMap.current[index], { type: "video/webm" });
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+
+      mediaRecorder.onstop = async () => {
+        const videoBlob = new Blob(recordedBlobs, { type: "video/webm" });
         const videoUrl = URL.createObjectURL(videoBlob);
         const videoPreview = document.getElementById(`video-preview-${index}`);
         videoPreview.srcObject = null;
         videoPreview.src = videoUrl;
         videoPreview.controls = true;
-  
+
         setIsUploading(true);
-  
-        const formData = new FormData();
+
+        // ✅ Upload Video to Cloudinary
+        let formData = new FormData();
         formData.append("file", videoBlob);
         formData.append("upload_preset", cloudinaryPreset);
-  
+
         try {
           const res = await fetch(cloudinaryUploadURL, {
             method: "POST",
             body: formData,
           });
-  
+
           const data = await res.json();
-          setRecordedVideos((prev) => ({ ...prev, [index]: data.secure_url }));
+          setRecordedVideos({ ...recordedVideos, [index]: data.secure_url });
           setIsUploading(false);
-          setVideoUploaded(true);
+          setVideoUploaded(true); // ✅ Set flag to true after upload
         } catch (error) {
           console.error("❌ Error uploading video to Cloudinary:", error);
           setIsUploading(false);
@@ -184,26 +149,11 @@ const CandidateAnswer = () => {
     }
   };
 
-
   if (!interview) return <p>Loading...</p>;
 
-  // ✅ Format Time Left
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
-
-
   return (
-    <div>
-      
+    <div>      
       <h2>Answer Questions - {interview.title}</h2>
-      {timeLeft !== null && (
-        <h3 style={{ color: "red" }}>
-          Time Remaining: {formatTime(timeLeft)}
-        </h3>
-      )}
       <form id="answer-form" onSubmit={handleSubmit} encType="multipart/form-data">
         {interview.questions.map((question, index) => (
           <div key={index}>
@@ -246,14 +196,7 @@ const CandidateAnswer = () => {
           </div>
         ))}
 
-        <button
-          type="submit"
-          id="submit-btn"
-          disabled={
-            isUploading ||
-            (interview.questions.some(q => q.answerType === "recording") && !videoUploaded)
-          }
-        >
+        <button type="submit" id="submit-btn" disabled={isUploading || !videoUploaded}>
           Submit Answers
         </button>
       </form>

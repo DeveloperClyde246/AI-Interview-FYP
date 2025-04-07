@@ -7,6 +7,7 @@ const RecruiterCandidateDetails = () => {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
 
+  // Fetch candidate details when component mounts or params change
   useEffect(() => {
     const fetchDetails = async () => {
       try {
@@ -69,15 +70,24 @@ const RecruiterCandidateDetails = () => {
         <>
           <h3>Submitted Answers</h3>
           <ul>
-            {response.answers.map((ans, i) => (
-              <li key={i}>
-                {ans.startsWith("http") ? (
-                  <a href={ans} target="_blank" rel="noreferrer">View File</a>
-                ) : (
-                  ans
-                )}
-              </li>
-            ))}
+          {response.answers.map((ans, i) => (
+            <li key={i}>
+              {ans.startsWith("http") ? (
+                <>
+                  <a href={ans} target="_blank" rel="noreferrer">View File</a> |{" "}
+                  <a
+                    href={`http://localhost:8501/upload_file?video_url=${encodeURIComponent(ans)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Streamlit Analyze
+                  </a>
+                </>
+              ) : (
+                ans
+              )}
+            </li>
+          ))}
           </ul>
 
           {response.videoMarks?.length > 0 && (

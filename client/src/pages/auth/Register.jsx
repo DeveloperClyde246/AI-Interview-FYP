@@ -21,7 +21,6 @@ const Register = () => {
       const res = await axios.post("http://localhost:5000/auth/register", formData, {
         withCredentials: true,
       });
-
       setSuccess(res.data.message);
       setTimeout(() => navigate("/login"), 1500); // Redirect to login after short delay
     } catch (err) {
@@ -36,23 +35,108 @@ const Register = () => {
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <h2 style={styles.title}>Register</h2>
+        {error && <p style={styles.error}>{error}</p>}
+        {success && <p style={{ ...styles.error, color: "green" }}>{success}</p>}
 
-      <form onSubmit={handleRegister}>
-        <input type="text" name="name" placeholder="Name" required onChange={handleChange} />
-        <input type="email" name="email" placeholder="Email" required onChange={handleChange} />
-        <input type="password" name="password" placeholder="Password" required onChange={handleChange} />
-        <button type="submit">Register</button>
-      </form>
+        <form onSubmit={handleRegister} style={styles.form}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Name"
+            required
+            onChange={handleChange}
+            style={styles.input}
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            required
+            onChange={handleChange}
+            style={styles.input}
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+            onChange={handleChange}
+            style={styles.input}
+          />
+          <button type="submit" style={styles.button}>
+            Register
+          </button>
+        </form>
 
-      <p>
-        Already have an account? <Link to="/login">Login</Link>
-      </p>
+        <p style={{ fontSize: "14px", marginTop: "10px", color: "#000000" }}>
+          Already have an account?{" "}
+          <Link to="/login" style={styles.forgotPassword}>
+            Login
+          </Link>
+        </p>
+      </div>
     </div>
   );
+};
+
+const styles = {
+  container: {
+    backgroundColor: "#A5F3B0",
+    height: "100vh",
+    width: "100vw",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  card: {
+    backgroundColor: "#fff",
+    padding: "30px",
+    borderRadius: "10px",
+    width: "300px",
+    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+    textAlign: "center",
+  },
+  title: {
+    marginBottom: "20px",
+    fontSize: "20px",
+    fontWeight: "bold",
+    color: "#000000",
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+  },
+  input: {
+    padding: "10px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+    fontSize: "14px",
+  },
+  forgotPassword: {
+    fontSize: "12px",
+    color: "#007bff",
+    textDecoration: "none",
+    marginBottom: "10px",
+  },
+  button: {
+    padding: "8px 88px",
+    backgroundColor: "#38bdf8",
+    border: "none",
+    borderRadius: "5px",
+    color: "#fff",
+    cursor: "pointer",
+    fontWeight: "bold",
+    alignSelf: "center",
+  },
+  error: {
+    color: "red",
+    fontSize: "14px",
+    marginBottom: "10px",
+  },
 };
 
 export default Register;

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import "../styles/AdminDashboard.css";
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
@@ -27,7 +28,6 @@ const AdminDashboard = () => {
 
   const createUser = async (e) => {
     e.preventDefault();
-
     try {
       await axios.post("http://localhost:5000/admin-dashboard/create", form, {
         withCredentials: true,
@@ -43,18 +43,6 @@ const AdminDashboard = () => {
         alert("Server error while creating user.");
         console.error("❌ Create error:", err);
       }
-    }
-  };
-
-  const updateUser = async (id, updates) => {
-    try {
-      await axios.post(`http://localhost:5000/admin-dashboard/edit/${id}`, updates, {
-        withCredentials: true,
-      });
-      fetchUsers();
-    } catch (err) {
-      console.error("❌ Error updating user:", err);
-      alert("Failed to update user.");
     }
   };
 
@@ -80,7 +68,6 @@ const AdminDashboard = () => {
   const handleLogout = async () => {
     try {
       const res = await axios.get("http://localhost:5000/auth/logout", { withCredentials: true });
-
       if (res.status === 200) {
         navigate("/login");
       } else {
@@ -93,45 +80,48 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div>
+    <div className="dashboard-container">
       <h2>Admin Dashboard</h2>
-      <h3>Create New User</h3>
 
-      <form onSubmit={createUser}>
-        <input name="name" value={form.name} onChange={handleChange} placeholder="Name" required />
-        <input name="email" value={form.email} onChange={handleChange} placeholder="Email" required />
-        <input name="password" value={form.password} onChange={handleChange} placeholder="Password" required />
-        <select name="role" value={form.role} onChange={handleChange}>
-          <option value="candidate">Candidate</option>
-          <option value="recruiter">Recruiter</option>
-          <option value="admin">Admin</option>
-        </select>
-        <button type="submit">Create</button>
-      </form>
+      <section className="create-user">
+        <h3>Create New User</h3>
+        <form onSubmit={createUser}>
+          <input name="name" value={form.name} onChange={handleChange} placeholder="Name" required />
+          <input name="email" value={form.email} onChange={handleChange} placeholder="Email" required />
+          <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="Password" required />
+          <select name="role" value={form.role} onChange={handleChange}>
+            <option value="candidate">Candidate</option>
+            <option value="recruiter">Recruiter</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button type="submit">Create</button>
+        </form>
+      </section>
 
-      <h3>All Users</h3>
-      <table border="1">
-        <thead>
-          <tr><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr>
-        </thead>
-        <tbody>
-          {Array.isArray(users) && users.map((u) => (
-            <tr key={u._id}>
-              <td>{u.name}</td>
-              <td>{u.email}</td>
-              <td>{u.role}</td>
-              <td>
-                <button onClick={() => navigate(`/admin-dashboard/edit/${u._id}`)}>Edit</button>
-                <button onClick={() => navigate(`/admin-dashboard/change-password/${u._id}`)}>Change Password</button>
-                <button onClick={() => deleteUser(u._id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <section className="user-list">
+        <h3>All Users</h3>
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            {Array.isArray(users) && users.map((u) => (
+              <tr key={u._id}>
+                <td>{u.name}</td>
+                <td>{u.email}</td>
+                <td>{u.role}</td>
+                <td>
+                  <button onClick={() => navigate(`/admin-dashboard/edit/${u._id}`)}>Edit</button>
+                  <button onClick={() => navigate(`/admin-dashboard/change-password/${u._id}`)}>Change Password</button>
+                  <button onClick={() => deleteUser(u._id)} className="danger">Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
 
-      <br />
-      <button onClick={handleLogout}>Logout</button>
+      <button onClick={handleLogout} className="logout-btn">Logout</button>
     </div>
   );
 };
