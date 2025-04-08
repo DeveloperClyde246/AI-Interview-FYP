@@ -69,7 +69,10 @@ const CandidateInterviews = () => {
               </p>
               <div className="results">
                 {interview.alreadySubmitted ? (
-                  <Link to={`/candidate/interview/${interview._id}/results`}>
+                  <Link
+                    to={`/candidate/interview/${interview._id}/results`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     View Results
                   </Link>
                 ) : (

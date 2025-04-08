@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import CandidateNavbar from "../components/CandidateNavbar";
+import "../styles/candidate/CandidateInterviewResults.css";
 
 const CandidateInterviewResults = () => {
   const { id } = useParams();
@@ -23,35 +24,61 @@ const CandidateInterviewResults = () => {
     fetchResults();
   }, [id]);
 
-  if (!result) return <p>Loading...</p>;
+  if (!result) return <p className="loading">Loading...</p>;
 
   return (
-    <div>
+    <div className="results-container">
       <CandidateNavbar />
-      <h2>Interview Results - {result.title}</h2>
-      <p><strong>Recruiter:</strong> {result.recruiter.name} ({result.recruiter.email})</p>
-      <p><strong>Status:</strong> {result.status}</p>
-      <p><strong>Submitted At:</strong> {new Date(result.submitDateTime).toLocaleString()}</p>
-
-      <h3>Questions & Your Answers</h3>
-      {result.questions.map((q, index) => (
-        <div key={index}>
-          <p><strong>Q{index + 1}:</strong> {q.questionText}</p>
+      <div className="results-card">
+        <h2>Interview Results - {result.title}</h2>
+        <div className="detail-group">
           <p>
-            <strong>Your Answer:</strong>{" "}
-            {result.answers[index]?.startsWith("http")
-              ? <a href={result.answers[index]} target="_blank" rel="noreferrer">View File</a>
-              : result.answers[index]}
+            <strong>Recruiter:</strong> {result.recruiter.name} ({result.recruiter.email})
           </p>
-          {result.videoMarks && result.videoMarks[index] != null && (
-            <p><strong>Mark:</strong> {result.videoMarks[index]}</p>
-          )}
-          <hr />
+          <p>
+            <strong>Status:</strong> {result.status}
+          </p>
+          <p>
+            <strong>Submitted At:</strong> {new Date(result.submitDateTime).toLocaleString()}
+          </p>
         </div>
-      ))}
 
-      <h3>Average Mark: {result.averageMark ?? "Pending"}</h3>
-      <button onClick={() => navigate("/candidate/interviews")}>← Back to My Interviews</button>
+        <div className="question-section">
+          <h3>Questions & Your Answers</h3>
+          {result.questions.map((q, index) => (
+            <div key={index} className="question-block">
+              <p className="question-text">
+                <strong>Q{index + 1}:</strong> {q.questionText}
+              </p>
+              <p className="answer-text">
+                <strong>Your Answer:</strong>{" "}
+                {result.answers[index]?.startsWith("http") ? (
+                  <a href={result.answers[index]} target="_blank" rel="noreferrer">
+                    View File
+                  </a>
+                ) : (
+                  result.answers[index]
+                )}
+              </p>
+              {result.videoMarks && result.videoMarks[index] != null && (
+                <p className="mark-text">
+                  <strong>Mark:</strong> {result.videoMarks[index]}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="summary">
+          <h3>Average Mark: {result.averageMark ?? "Pending"}</h3>
+        </div>
+
+        <div className="action-group">
+          <button onClick={() => navigate("/candidate/interviews")} className="back-btn">
+            ← Back to My Interviews
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

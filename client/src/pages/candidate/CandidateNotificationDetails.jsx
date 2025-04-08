@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import CandidateNavbar from "../components/CandidateNavbar";
+import "../styles/candidate/CandidateNotificationDetails.css";
 
 const CandidateNotificationDetails = () => {
   const { id } = useParams();
@@ -21,13 +22,13 @@ const CandidateNotificationDetails = () => {
         if (res.status === 200) {
           setNotification(res.data.notification);
 
-          // ✅ Check if the interview is within 24 hours (if applicable)
+          // Check if the interview is within 24 hours (if applicable)
           if (res.data.interviewDate) {
             const interviewDate = new Date(res.data.interviewDate);
             const now = new Date();
             const timeDiff = interviewDate - now;
 
-            // ✅ Disable delete if interview within 24 hours
+            // Disable delete if interview within 24 hours
             if (timeDiff <= 24 * 60 * 60 * 1000 && timeDiff > 0) {
               setDeletable(false);
             }
@@ -42,7 +43,7 @@ const CandidateNotificationDetails = () => {
     fetchNotification();
   }, [id]);
 
-  // ✅ Handle Notification Deletion
+  // Handle Notification Deletion
   const handleDelete = async () => {
     try {
       const res = await axios.delete(
@@ -55,7 +56,6 @@ const CandidateNotificationDetails = () => {
         navigate("/candidate");
       }
     } catch (err) {
-      // ✅ Handle 403 error properly if within 24 hours
       if (err.response && err.response.status === 403) {
         alert(
           err.response.data.message ||
@@ -69,30 +69,36 @@ const CandidateNotificationDetails = () => {
   };
 
   if (error) {
-    return <p style={{ color: "red" }}>{error}</p>;
+    return <p className="error">{error}</p>;
   }
 
   if (!notification) {
-    return <p>Loading...</p>;
+    return <p className="loading">Loading...</p>;
   }
 
   return (
-    <div>
+    <div className="container">
       <CandidateNavbar />
-      <h2>Notification Details</h2>
-      <p>
-        <strong>Message:</strong> {notification.message}
-      </p>
-      <p>
-        <strong>Notification created At:</strong>{" "}
-        {new Date(notification.createdAt).toLocaleString()}
-      </p>
-
-      <button onClick={handleDelete} disabled={!deletable}>
-        Delete Notification
-      </button>
-      <br />
-      <Link to="/candidate">Back to Dashboard</Link>
+      <div className="notification-card">
+        <h2>Notification Details</h2>
+        <div className="detail-group">
+          <p>
+            <strong>Message:</strong> {notification.message}
+          </p>
+          <p>
+            <strong>Created At:</strong>{" "}
+            {new Date(notification.createdAt).toLocaleString()}
+          </p>
+        </div>
+        <div className="actions">
+          <button onClick={handleDelete} disabled={!deletable} className="delete-btn">
+            Delete Notification
+          </button>
+        </div>
+        <Link to="/candidate" className="back-link">
+          ← Back to Dashboard
+        </Link>
+      </div>
     </div>
   );
 };

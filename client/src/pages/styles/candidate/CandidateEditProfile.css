@@ -1,0 +1,142 @@
+/* Overall container with soft background */
+.edit-profile-container {
+    background: #f4f7f9;
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+    min-width: 700px;
+  }
+  
+  /* Card styling for profile editing */
+  .edit-profile-card {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .edit-profile-card h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Form styling */
+  .edit-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  .form-input {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .form-textarea {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  /* Education fields styling */
+  .education-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .education-input {
+    flex: 1;
+    padding: 0.5rem;
+    font-size: 0.95rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  /* Buttons styling */
+  .add-btn,
+  .remove-btn,
+  .submit-btn,
+  .back-btn {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+  }
+  
+  .add-btn {
+    background-color: #38bdf8;
+    color: #fff;
+    align-self: flex-start;
+  }
+  
+  .add-btn:hover {
+    background-color: #2a9bd4;
+  }
+  
+  .remove-btn {
+    background-color: #e74c3c;
+    color: #fff;
+  }
+  
+  .remove-btn:hover {
+    background-color: #c0392b;
+  }
+  
+  .submit-btn {
+    background-color: #38bdf8;
+    color: #fff;
+    width: 100%;
+  }
+  
+  .submit-btn:hover {
+    background-color: #2a9bd4;
+  }
+  
+  .back-btn {
+    background-color: #555;
+    color: #fff;
+    width: 100%;
+    margin-top: 1rem;
+  }
+  
+  .back-btn:hover {
+    background-color: #333;
+  }
+  
+  /* Error and success messages styling */
+  .error-message {
+    color: red;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .success-message {
+    color: green;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  

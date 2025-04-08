@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import CandidateNavbar from "../components/CandidateNavbar";
+import "../styles/candidate/CandidateChangePassword.css";
 
 const CandidateChangePassword = () => {
   const [form, setForm] = useState({
@@ -31,7 +32,7 @@ const CandidateChangePassword = () => {
       if (res.status === 200) {
         setSuccess("Password updated successfully!");
         setForm({ currentPassword: "", newPassword: "" });
-        navigate("/candidate/profile")
+        navigate("/candidate/profile");
       }
     } catch (err) {
       console.error("Error changing password:", err);
@@ -44,39 +45,46 @@ const CandidateChangePassword = () => {
   return (
     <div>
       <CandidateNavbar />
-      <h2>Change Password</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
+      <div className="change-password-container">
 
-      <form onSubmit={handlePasswordChange}>
-        <label>Current Password:</label>
-        <input
-          type="password"
-          name="currentPassword"
-          value={form.currentPassword}
-          onChange={handleChange}
-          required
-        />
-        <br />
-
-        <label>New Password:</label>
-        <input
-          type="password"
-          name="newPassword"
-          value={form.newPassword}
-          onChange={handleChange}
-          required
-        />
-        <br />
-
-        <button type="submit">Change Password</button>
-      </form>
-
-      <br />
-      <button onClick={() => navigate("/candidate/profile")}>
-        Back to Profile
-      </button>
+      <div className="change-password-card">
+        <h2>Change Password</h2>
+        {error && <p className="error-message">{error}</p>}
+        {success && <p className="success-message">{success}</p>}
+        <form onSubmit={handlePasswordChange} className="change-password-form">
+          <div className="form-group">
+            <label>Current Password:</label>
+            <input
+              type="password"
+              name="currentPassword"
+              value={form.currentPassword}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+          <div className="form-group">
+            <label>New Password:</label>
+            <input
+              type="password"
+              name="newPassword"
+              value={form.newPassword}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+          <button type="submit" className="submit-btn">
+            Change Password
+          </button>
+        </form>
+        <button onClick={() => navigate("/candidate/profile")} className="back-btn">
+          Back to Profile
+        </button>
+      </div>
     </div>
+    </div>
+    
   );
 };
 

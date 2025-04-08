@@ -8,6 +8,7 @@ html, body {
     background: #f4f7f9;
     min-height: 100vh;
     padding: 2rem;
+    min-width: 800px;
   }
   
   .profile-card {
@@ -72,6 +73,14 @@ html, body {
     background-color: #2a9bd4;
   }
   
+  .education-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem; 
+  }
+
   .error {
     color: red;
     text-align: center;
