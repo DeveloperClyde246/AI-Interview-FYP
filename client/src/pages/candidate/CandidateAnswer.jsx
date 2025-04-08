@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 // import CandidateNavbar from "../components/CandidateNavbar";
+import "../styles/candidate/CandidateAnswer.css";
 
 const CandidateAnswer = () => {
   const { id } = useParams();
@@ -11,7 +12,6 @@ const CandidateAnswer = () => {
   const [fileAnswers, setFileAnswers] = useState({});
   const [recordedVideos, setRecordedVideos] = useState({});
   const [isUploading, setIsUploading] = useState(false);
-  // Removed videoUploaded state since we'll compute it per question
 
   const cloudinaryPreset = "interview_responses"; // Update from Cloudinary settings
   const cloudinaryUploadURL = "https://api.cloudinary.com/v1_1/dnxuioifx/video/upload"; // Cloudinary Upload URL
@@ -33,7 +33,7 @@ const CandidateAnswer = () => {
     fetchInterviewDetails();
   }, [id]);
 
-  // ✅ Handle Text and File Changes
+  // Handle Text and File Changes
   const handleInputChange = (index, value) => {
     const updatedAnswers = [...answers];
     updatedAnswers[index] = value;
@@ -44,7 +44,7 @@ const CandidateAnswer = () => {
     setFileAnswers({ ...fileAnswers, [index]: file });
   };
 
-  // ✅ Handle Video Recording
+  // Handle Video Recording
   let mediaRecorder;
   let recordedBlobs = [];
   let isRecording = false;
@@ -86,7 +86,7 @@ const CandidateAnswer = () => {
 
         setIsUploading(true);
 
-        // ✅ Upload Video to Cloudinary
+        // Upload Video to Cloudinary
         let formData = new FormData();
         formData.append("file", videoBlob);
         formData.append("upload_preset", cloudinaryPreset);
@@ -108,7 +108,7 @@ const CandidateAnswer = () => {
     }
   };
 
-  // ✅ Compute if all video questions have been answered (if any)
+  // Compute if all video questions have been answered (if any)
   const allRecordingsUploaded = interview
     ? interview.questions.every((question, index) => {
         if (question.answerType === "recording") {
@@ -118,11 +118,11 @@ const CandidateAnswer = () => {
       })
     : true;
 
-  // ✅ Handle Form Submission
+  // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Check if videos are still uploading or not all recordings are uploaded
+    // Check if videos are still uploading or not all recordings are uploaded
     if (isUploading || !allRecordingsUploaded) {
       alert("Please wait for all video uploads to complete before submitting.");
       return;
@@ -160,59 +160,68 @@ const CandidateAnswer = () => {
     }
   };
 
-  if (!interview) return <p>Loading...</p>;
+  if (!interview) return <p className="loading">Loading...</p>;
 
   return (
-    <div>
-      <h2>Answer Questions - {interview.title}</h2>
-      <form id="answer-form" onSubmit={handleSubmit} encType="multipart/form-data">
-        {interview.questions.map((question, index) => (
-          <div key={index}>
-            <p>
-              <strong>Question {index + 1}:</strong> {question.questionText}
-            </p>
+    <div className="candidate-answer-container">
+      {/* Uncomment below if you wish to display the navbar */}
+      {/* <CandidateNavbar /> */}
+      <div className="candidate-answer-card">
+        <h2>Answer Questions - {interview.title}</h2>
+        <form id="answer-form" onSubmit={handleSubmit} encType="multipart/form-data" className="candidate-answer-form">
+          {interview.questions.map((question, index) => (
+            <div key={index} className="question-block">
+              <p className="question-text">
+                <strong>Question {index + 1}:</strong> {question.questionText}
+              </p>
 
-            {question.answerType === "text" && (
-              <textarea
-                name={`answers[${index}]`}
-                value={answers[index]}
-                onChange={(e) => handleInputChange(index, e.target.value)}
-                required
-              />
-            )}
+              {question.answerType === "text" && (
+                <textarea
+                  name={`answers[${index}]`}
+                  value={answers[index]}
+                  onChange={(e) => handleInputChange(index, e.target.value)}
+                  required
+                  className="text-answer"
+                />
+              )}
 
-            {question.answerType === "file" && (
-              <input
-                type="file"
-                name={`fileAnswers[${index}]`}
-                onChange={(e) => handleFileChange(index, e.target.files[0])}
-                accept="*/*"
-              />
-            )}
+              {question.answerType === "file" && (
+                <input
+                  type="file"
+                  name={`fileAnswers[${index}]`}
+                  onChange={(e) => handleFileChange(index, e.target.files[0])}
+                  accept="*/*"
+                  className="file-input"
+                />
+              )}
 
-            {question.answerType === "recording" && (
-              <div>
-                <button type="button" onClick={() => startVideoRecording(index)}>
-                  Start Recording
-                </button>
-                <button type="button" onClick={() => stopVideoRecording(index)}>
-                  Stop Recording
-                </button>
-                <video id={`video-preview-${index}`} controls autoPlay muted></video>
-                <input type="hidden" name={`answers[${index}]`} value={recordedVideos[index] || ""} />
-              </div>
-            )}
+              {question.answerType === "recording" && (
+                <div className="recording-section">
+                  <div className="record-buttons">
+                    <button type="button" onClick={() => startVideoRecording(index)} className="record-btn">
+                      Start Recording
+                    </button>
+                    <button type="button" onClick={() => stopVideoRecording(index)} className="record-btn">
+                      Stop Recording
+                    </button>
+                  </div>
+                  <video id={`video-preview-${index}`} className="video-preview" controls autoPlay muted></video>
+                  <input type="hidden" name={`answers[${index}]`} value={recordedVideos[index] || ""} />
+                </div>
+              )}
+            </div>
+          ))}
 
-            <hr />
+          <div className="action-buttons">
+            <button type="submit" id="submit-btn" className="submit-btn" disabled={isUploading || !allRecordingsUploaded}>
+              Submit Answers
+            </button>
           </div>
-        ))}
-
-        <button type="submit" id="submit-btn" disabled={isUploading || !allRecordingsUploaded}>
-          Submit Answers
-        </button>
-      </form>
-
-      <button onClick={() => navigate("/candidate/interviews")}>Back to Interviews</button>
+        </form>
+        {/* <button onClick={() => navigate("/candidate/interviews")} className="back-btn">
+          Back to Interviews
+        </button> */}
+      </div>
     </div>
   );
 };

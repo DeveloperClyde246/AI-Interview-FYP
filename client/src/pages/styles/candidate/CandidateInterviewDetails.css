@@ -10,6 +10,7 @@ html, body {
     background: #f4f7f9;
     min-height: 100vh;
     padding: 2rem;
+    min-width: 700px;
   }
   
   /* Centered card for interview details */
