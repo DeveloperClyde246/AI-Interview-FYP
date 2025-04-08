@@ -1,0 +1,90 @@
+/* Full-page container styling */
+.container {
+    padding: 2rem;
+    min-height: 100vh;
+    background: #f4f7f9;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Page heading */
+  .container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Interview cards grid layout: Three cards per row */
+  .interview-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  /* Interview card styling */
+  .interview-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .interview-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .interview-card h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.2rem;
+  }
+  
+  .interview-card p {
+    margin: 0.2rem 0;
+    color: #555;
+    font-size: 0.95rem;
+  }
+  
+  /* Status styling */
+  .status {
+    font-weight: bold;
+  }
+  
+  .status.submitted {
+    color: green;
+  }
+  
+  .status.submitted-late {
+    color: orange;
+  }
+  
+  .status.pending {
+    color: gray;
+  }
+  
+  /* Results link styling */
+  .results {
+    margin-top: 0.5rem;
+  }
+  
+  .results a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+  }
+  
+  /* Back link styling */
+  .back-link {
+    display: inline-block;
+    margin-top: 2rem;
+    text-decoration: none;
+    color: #007bff;
+    font-size: 1rem;
+    text-align: center;
+    width: 100%;
+  }
+  
