@@ -40,13 +40,13 @@ const styles = {
     justifyContent: "space-around",
     alignItems: "center",
     padding: "10px 20px",
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#82fadc",
     borderBottom: "1px solid #ccc",
     marginBottom: "20px",
   },
   navLink: {
     textDecoration: "none",
-    color: "#007bff",
+    color: "#0a00bf",
     fontWeight: "bold",
   },
   logoutButton: {

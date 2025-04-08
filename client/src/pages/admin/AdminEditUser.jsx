@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import "../styles/AdminEditUser.css";
+import "../styles/admin/AdminEditUser.css";
 
 const AdminEditUser = () => {
   const { id } = useParams();

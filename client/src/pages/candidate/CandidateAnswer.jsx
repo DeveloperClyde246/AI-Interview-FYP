@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import CandidateNavbar from "../components/CandidateNavbar";
+// import CandidateNavbar from "../components/CandidateNavbar";
 
 const CandidateAnswer = () => {
   const { id } = useParams();
@@ -11,9 +11,8 @@ const CandidateAnswer = () => {
   const [fileAnswers, setFileAnswers] = useState({});
   const [recordedVideos, setRecordedVideos] = useState({});
   const [isUploading, setIsUploading] = useState(false);
-  const [videoUploaded, setVideoUploaded] = useState(false); 
-  const [timeLeft, setTimeLeft] = useState(null);
-  const [timerStarted, setTimerStarted] = useState(false);
+  // Removed videoUploaded state since we'll compute it per question
+
   const cloudinaryPreset = "interview_responses"; // Update from Cloudinary settings
   const cloudinaryUploadURL = "https://api.cloudinary.com/v1_1/dnxuioifx/video/upload"; // Cloudinary Upload URL
 
@@ -99,9 +98,8 @@ const CandidateAnswer = () => {
           });
 
           const data = await res.json();
-          setRecordedVideos({ ...recordedVideos, [index]: data.secure_url });
+          setRecordedVideos((prev) => ({ ...prev, [index]: data.secure_url }));
           setIsUploading(false);
-          setVideoUploaded(true); // ✅ Set flag to true after upload
         } catch (error) {
           console.error("❌ Error uploading video to Cloudinary:", error);
           setIsUploading(false);
@@ -110,13 +108,23 @@ const CandidateAnswer = () => {
     }
   };
 
+  // ✅ Compute if all video questions have been answered (if any)
+  const allRecordingsUploaded = interview
+    ? interview.questions.every((question, index) => {
+        if (question.answerType === "recording") {
+          return recordedVideos[index];
+        }
+        return true;
+      })
+    : true;
+
   // ✅ Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Check if videos are still uploading
-    if (isUploading) {
-      alert("Please wait for the video to finish uploading before submitting.");
+    // ✅ Check if videos are still uploading or not all recordings are uploaded
+    if (isUploading || !allRecordingsUploaded) {
+      alert("Please wait for all video uploads to complete before submitting.");
       return;
     }
 
@@ -132,9 +140,11 @@ const CandidateAnswer = () => {
     });
 
     try {
-      const res = await axios.post(`http://localhost:5000/candidate/interview/${id}/submit`, formData, {
-        withCredentials: true,
-      });
+      const res = await axios.post(
+        `http://localhost:5000/candidate/interview/${id}/submit`,
+        formData,
+        { withCredentials: true }
+      );
 
       if (res.status === 200) {
         alert(`Answers submitted successfully! Average Mark: ${res.data.avgMark || "N/A"}`);
@@ -153,8 +163,7 @@ const CandidateAnswer = () => {
   if (!interview) return <p>Loading...</p>;
 
   return (
-    <div>      
-      {/* <CandidateNavbar /> */}
+    <div>
       <h2>Answer Questions - {interview.title}</h2>
       <form id="answer-form" onSubmit={handleSubmit} encType="multipart/form-data">
         {interview.questions.map((question, index) => (
@@ -198,7 +207,7 @@ const CandidateAnswer = () => {
           </div>
         ))}
 
-        <button type="submit" id="submit-btn" disabled={isUploading || !videoUploaded}>
+        <button type="submit" id="submit-btn" disabled={isUploading || !allRecordingsUploaded}>
           Submit Answers
         </button>
       </form>

@@ -4,40 +4,10 @@ import {  Link, useNavigate } from "react-router-dom";
 import CandidateNavbar from "../components/CandidateNavbar";
 
 const CandidateFAQ = () => {
-    // ✅ Handle Logout
-    const navigate = useNavigate();
-
-    const handleLogout = async () => {
-      try {
-        const res = await axios.get(
-          "http://localhost:5000/auth/logout",
-          {},
-          { withCredentials: true }
-        );
   
-        if (res.status === 200) {
-          alert("Logout successful!");
-          navigate("/login"); // ✅ Redirect to login after successful logout
-        } else {
-          alert("Logout failed. Please try again.");
-        }
-      } catch (err) {
-        console.error("Error during logout:", err);
-        alert("Error logging out. Please try again.");
-      }
-    };
-
-
   return (
     <div>
       <CandidateNavbar />
-      <nav style={styles.navbar}>
-        <Link to="/candidate" style={styles.navLink}>Dashboard</Link>
-        <Link to="/candidate/interviews" style={styles.navLink}>Interviews</Link>
-        <Link to="/candidate/faq" style={styles.navLink}>FAQ</Link>
-        <Link to="/candidate/profile" style={styles.navLink}>Profile</Link>
-        <button onClick={handleLogout} style={styles.logoutButton}>Logout</button>
-      </nav>
 
       <h2>Frequently Asked Questions (FAQ)</h2>
 

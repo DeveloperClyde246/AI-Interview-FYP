@@ -105,7 +105,7 @@ const CreateInterview = () => {
         <label>Scheduled Date:</label>
         <input type="datetime-local" name="scheduled_date" value={form.scheduled_date} min={getCurrentDateTime()} onChange={handleChange} required />
 
-        <label>Answer Duration (seconds):</label>
+        <label>Answer Duration (Mins):</label>
         <input
           type="number"
           name="answerDuration"
@@ -132,7 +132,7 @@ const CreateInterview = () => {
               <option value="text">Text-Based Answer</option>
               <option value="recording">Recording on Portal</option>
             </select>
-            <label>
+            {/* <label>
               <input
                 type="checkbox"
                 checked={q.recordingRequired}
@@ -141,7 +141,7 @@ const CreateInterview = () => {
                 }
               />
               Requires Answer
-            </label>
+            </label> */}
           </div>
         ))}
         <button type="button" onClick={addQuestion}>

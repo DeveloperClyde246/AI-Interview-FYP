@@ -359,7 +359,7 @@ router.post("/interview/:id/submit", upload.array("fileAnswers", 5), async (req,
 
         const aiRes = await axios.post("http://localhost:5001/analyze-video", form, {
           headers: form.getHeaders(),
-          timeout: 600000,
+          timeout: 18000000,
         });
         // // 3. Send to Flask AI API
         // const aiRes = await axios.post("http://localhost:5001/analyze-video", {
