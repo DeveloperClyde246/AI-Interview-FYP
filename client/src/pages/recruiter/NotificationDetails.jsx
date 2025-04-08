@@ -13,49 +13,65 @@ const NotificationDetails = () => {
   useEffect(() => {
     const fetchNotification = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/notifications/${id}`, {
-          withCredentials: true,
-        });
-
+        const res = await axios.get(
+          `http://localhost:5000/recruiter/notifications/${id}`,
+          { withCredentials: true }
+        );
+  
         if (res.status === 200) {
-          setNotification(res.data.notification);
-
-          // ✅ Check if the interview is within 24 hours
-          const interviewDate = new Date(res.data.interviewDate);
-          const now = new Date();
-          const timeDiff = interviewDate - now;
-
-          if (timeDiff <= 24 * 60 * 60 * 1000 && timeDiff > 0) {
-            setDeletable(false);
+          const notif = res.data.notification;
+          setNotification(notif);
+  
+          // Check interviewDate from the notification object
+          if (notif.interviewDate) {
+            const interviewDate = new Date(notif.interviewDate);
+            if (!isNaN(interviewDate.getTime())) {
+              const now = new Date();
+              const timeDiff = interviewDate.getTime() - now.getTime();
+              console.log("Interview Date:", interviewDate, "Time Diff:", timeDiff);
+              // Disable deletion if the interview is in the future and within the next 24 hours
+              if (timeDiff > 0 && timeDiff <= 24 * 60 * 60 * 1000) {
+                setDeletable(false);
+              } else {
+                setDeletable(true);
+              }
+            } else {
+              setDeletable(true);
+            }
+          } else {
+            // If there is no interview date, allow deletion
+            setDeletable(true);
           }
         }
       } catch (err) {
-        console.error("Error fetching notification:", err);
+        console.error("❌ Error fetching notification:", err);
         setError("Error fetching notification.");
       }
     };
-
+  
     fetchNotification();
   }, [id]);
+  
 
   const handleDelete = async () => {
     try {
-      const res = await axios.post(
-        `http://localhost:5000/notifications/${id}/delete`,
-        {},
+      const res = await axios.delete(
+        `http://localhost:5000/recruiter/notifications/${id}/delete`,
         { withCredentials: true }
       );
-  
+
       if (res.status === 200) {
-        alert("Notification deleted successfully!");
+        alert("✅ Notification deleted successfully!");
         navigate("/recruiter");
       }
     } catch (err) {
-      // ✅ Handle 403 error properly
       if (err.response && err.response.status === 403) {
-        alert(err.response.data.message || "You cannot delete this notification because the interview is happening within 24 hours.");
+        alert(
+          err.response.data.message ||
+            "You cannot delete this notification because the interview is happening within 24 hours."
+        );
       } else {
-        console.error("Error deleting notification:", err);
+        console.error("❌ Error deleting notification:", err);
         alert("Error deleting notification. Please try again.");
       }
     }

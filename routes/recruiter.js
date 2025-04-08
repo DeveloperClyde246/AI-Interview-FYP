@@ -15,11 +15,11 @@ router.use(authMiddleware(["recruiter"]));
 
 //---------------Dashboard page------------------//
 // ✅ Recruiter Dashboard (GET all notifications + interviews)
+//Recruiter Dashboard Route
 router.get("/", async (req, res) => {
   try {
     console.log("📥 Recruiter dashboard accessed");
     const recruiterId = req.user.id;
-
     const now = new Date();
     const nextDay = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours ahead
 
@@ -32,6 +32,7 @@ router.get("/", async (req, res) => {
       const formattedDate = new Date(interview.scheduled_date).toLocaleString();
       const recruiterMsg = `You have an interview titled "${interview.title}" scheduled for ${formattedDate}.`;
 
+      // Create notification with interviewDate
       const recruiterNotification = await Notification.findOne({
         userId: recruiterId,
         message: recruiterMsg,
@@ -42,6 +43,7 @@ router.get("/", async (req, res) => {
           userId: recruiterId,
           message: recruiterMsg,
           status: "unread",
+          interviewDate: interview.scheduled_date,
         });
       }
 
@@ -58,6 +60,7 @@ router.get("/", async (req, res) => {
             userId: candidate._id,
             message: candidateMsg,
             status: "unread",
+            interviewDate: interview.scheduled_date,
           });
         }
       }
@@ -82,8 +85,50 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Get Notification Details
+router.get("/notifications/:id", async (req, res) => {
+  try {
+    const notification = await Notification.findById(req.params.id);
+    if (!notification)
+      return res.status(404).json({ message: "Notification not found" });
 
-//---------------Create Interview pages--------------------//
+    res.json({ notification });
+  } catch (error) {
+    console.error("❌ Error fetching notification details:", error.message);
+    res.status(500).json({ message: "Error fetching notification details" });
+  }
+});
+
+// Delete Notification
+router.delete("/notifications/:id/delete", async (req, res) => {
+  try {
+    const notification = await Notification.findById(req.params.id);
+    if (!notification) {
+      return res.status(404).json({ message: "Notification not found" });
+    }
+    // If the notification relates to an interview, check the interviewDate.
+    if (notification.interviewDate) {
+      const interviewDate = new Date(notification.interviewDate);
+      const now = new Date();
+      const timeDiff = interviewDate - now;
+      // If the interview is in the future and is within 24 hours, prevent deletion.
+      if (timeDiff > 0 && timeDiff <= 24 * 60 * 60 * 1000) {
+        return res.status(403).json({
+          message:
+            "You cannot delete this notification because the interview is happening within 24 hours.",
+        });
+      }
+    }
+    await Notification.findByIdAndDelete(req.params.id);
+    res.json({ message: "Notification deleted successfully" });
+  } catch (error) {
+    console.error("❌ Error deleting notification:", error.message);
+    res.status(500).json({ message: "Error deleting notification" });
+  }
+});
+
+
+//Create Interview pages
 // ✅ Fetch candidates for create-interview page
 router.get("/create-interview", async (req, res) => {
   try {
