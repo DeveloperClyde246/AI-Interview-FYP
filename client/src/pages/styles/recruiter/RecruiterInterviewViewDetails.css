@@ -1,0 +1,104 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .container {
+    background: #f4f7f9;
+    min-height: 100vh;
+    padding: 2rem;
+    min-width: 700px;
+  }
+  
+  .details-card {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+  }
+  
+  .details-card h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+
+  .details-card h3 {
+    text-align: center;
+    color: #000000;
+    margin-bottom: 1.5rem;
+  }
+  
+  .detail-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .detail-group p {
+    margin: 0.5rem 0;
+    color: #555;
+  }
+  
+  .question-list, .candidate-list {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #555;
+  }
+  
+  .question-list li, .candidate-list li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .answer-type {
+    font-style: italic;
+    color: #777;
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .action-btn {
+    padding: 0.8rem 1.2rem;
+    background-color: #38bdf8;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+  }
+  
+  .action-btn:hover {
+    background-color: #2a9bd4;
+  }
+  
+  .back-link-container {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .back-link {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 1rem;
+  }
+  
+  .error {
+    color: red;
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .loading {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  

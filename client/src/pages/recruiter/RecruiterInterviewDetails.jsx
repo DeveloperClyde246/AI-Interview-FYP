@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
 import RecruiterNavbar from "../components/RecruiterNavbar"; 
+import "../styles/recruiter/RecruiterInterviewViewDetails.css";
 
 const RecruiterInterviewViewDetails = () => {
   const { id } = useParams();
@@ -24,53 +25,67 @@ const RecruiterInterviewViewDetails = () => {
     fetchInterview();
   }, [id]);
 
-  if (!interview) return <p>Loading interview details...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (error) return <p className="error">{error}</p>;
+  if (!interview) return <p className="loading">Loading interview details...</p>;
 
   return (
-    <div>
+    <div className="container">
       <RecruiterNavbar />
-      <h2>Interview Details</h2>
+      <div className="details-card">
+        <h2>Interview Details</h2>
+        
+        <div className="detail-group">
+          <p><strong>Title:</strong> {interview.title}</p>
+          <p><strong>Description:</strong> {interview.description}</p>
+          <p>
+            <strong>Scheduled Date:</strong>{" "}
+            {new Date(interview.scheduled_date).toLocaleString()}
+          </p>
+          <p><strong>Answer Duration:</strong> {interview.answerDuration} seconds</p>
+        </div>
 
-      <p><strong>Title:</strong> {interview.title}</p>
-      <p><strong>Description:</strong> {interview.description}</p>
-      <p><strong>Scheduled Date:</strong> {new Date(interview.scheduled_date).toLocaleString()}</p>
-      <p><strong>Answer Duration:</strong> {interview.answerDuration} seconds</p>
+        <div className="detail-group">
+          <h3>Questions</h3>
+          <ol className="question-list">
+            {interview.questions.map((q, i) => (
+              <li key={i}>
+                {q.questionText}{" "}
+                <span className="answer-type">({q.answerType})</span>
+              </li>
+            ))}
+          </ol>
+        </div>
 
-      <h3>Questions</h3>
-      <ol>
-        {interview.questions.map((q, i) => (
-          <li key={i}>
-            {q.questionText} — <i>{q.answerType}</i>
-          </li>
-        ))}
-      </ol>
+        <div className="detail-group">
+          <h3>Assigned Candidates</h3>
+          {interview.candidates.length > 0 ? (
+            <ul className="candidate-list">
+              {interview.candidates.map((c) => (
+                <li key={c._id}>
+                  {c.name} ({c.email})
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No candidates assigned yet.</p>
+          )}
+        </div>
 
-      <h3>Assigned Candidates</h3>
-      {interview.candidates.length > 0 ? (
-        <ul>
-          {interview.candidates.map((c) => (
-            <li key={c._id}>
-              {c.name} ({c.email})
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No candidates assigned yet.</p>
-      )}
+        <div className="button-group">
+          <Link to={`/recruiter/interview/${id}/manage-candidates`}>
+            <button className="action-btn">Manage Candidates</button>
+          </Link>
+          <Link to={`/recruiter/interview/${id}/edit-form`}>
+            <button className="action-btn">Edit Interview Form</button>
+          </Link>
+        </div>
 
-      <br />
-      <div>
-        <Link to={`/recruiter/interview/${id}/manage-candidates`}>
-          <button>Manage Candidates</button>
-        </Link>{" "}
-        <Link to={`/recruiter/interview/${id}/edit-form`}>
-          <button>Edit Interview Form</button>
-        </Link>
+        <div className="back-link-container">
+          <Link to="/recruiter/interviews" className="back-link">
+            ← Back to Interviews
+          </Link>
+        </div>
       </div>
-
-      <br />
-      <Link to="/recruiter/interviews">← Back to Interviews</Link>
     </div>
   );
 };
