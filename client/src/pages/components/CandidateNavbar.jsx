@@ -50,7 +50,7 @@ const styles = {
     fontWeight: "bold",
   },
   logoutButton: {
-    backgroundColor: "#dc3545",
+    backgroundColor: "#343835",
     color: "#fff",
     border: "none",
     padding: "8px 12px",
