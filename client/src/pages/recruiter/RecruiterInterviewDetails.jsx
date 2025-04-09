@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams, Link } from "react-router-dom";
-import RecruiterNavbar from "../components/RecruiterNavbar"; 
+import { useParams, useNavigate, Link } from "react-router-dom";
+import RecruiterNavbar from "../components/RecruiterNavbar";
 import "../styles/recruiter/RecruiterInterviewViewDetails.css";
 
 const RecruiterInterviewViewDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [interview, setInterview] = useState(null);
   const [error, setError] = useState("");
 
@@ -49,8 +50,7 @@ const RecruiterInterviewViewDetails = () => {
           <ol className="question-list">
             {interview.questions.map((q, i) => (
               <li key={i}>
-                {q.questionText}{" "}
-                <span className="answer-type">({q.answerType})</span>
+                {q.questionText} <span className="answer-type">({q.answerType})</span>
               </li>
             ))}
           </ol>
@@ -81,9 +81,9 @@ const RecruiterInterviewViewDetails = () => {
         </div>
 
         <div className="back-link-container">
-          <Link to="/recruiter/interviews" className="back-link">
+          <button onClick={() => navigate("/recruiter/interviews")} className="back-btn">
             ← Back to Interviews
-          </Link>
+          </button>
         </div>
       </div>
     </div>

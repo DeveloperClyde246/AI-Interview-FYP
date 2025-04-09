@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import RecruiterNavbar from "../components/RecruiterNavbar"; 
+import RecruiterNavbar from "../components/RecruiterNavbar";
+import "../styles/recruiter/RecruiterNotificationDetails.css";
 
-const NotificationDetails = () => {
+const RecruiterNotificationDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [notification, setNotification] = useState(null);
@@ -17,11 +18,11 @@ const NotificationDetails = () => {
           `http://localhost:5000/recruiter/notifications/${id}`,
           { withCredentials: true }
         );
-  
+
         if (res.status === 200) {
           const notif = res.data.notification;
           setNotification(notif);
-  
+
           // Check interviewDate from the notification object
           if (notif.interviewDate) {
             const interviewDate = new Date(notif.interviewDate);
@@ -48,10 +49,9 @@ const NotificationDetails = () => {
         setError("Error fetching notification.");
       }
     };
-  
+
     fetchNotification();
   }, [id]);
-  
 
   const handleDelete = async () => {
     try {
@@ -78,31 +78,45 @@ const NotificationDetails = () => {
   };
 
   if (error) {
-    return <p style={{ color: "red" }}>{error}</p>;
+    return <p className="error">{error}</p>;
   }
 
   if (!notification) {
-    return <p>Loading...</p>;
+    return <p className="loading">Loading notification details...</p>;
   }
 
   return (
-    <div>
+    <div className="notification-details-container">
       <RecruiterNavbar />
-      <h2>Notification Details</h2>
-      <p>
-        <strong>Message:</strong> {notification.message}
-      </p>
-      <p>
-        <strong>Notification created At:</strong> {new Date(notification.createdAt).toLocaleString()}
-      </p>
-
-      <button onClick={handleDelete} disabled={!deletable}>
-        Delete Notification
-      </button>
-      <br />
-      <a href="/recruiter">Back to Dashboard</a>
+      <div className="notification-details-card">
+        <h2>Notification Details</h2>
+        <div className="detail-group">
+          <p>
+            <strong>Message:</strong> {notification.message}
+          </p>
+          <p>
+            <strong>Created At:</strong>{" "}
+            {new Date(notification.createdAt).toLocaleString()}
+          </p>
+        </div>
+        <div className="button-group">
+          <button
+            onClick={handleDelete}
+            disabled={!deletable}
+            className="delete-btn"
+          >
+            Delete Notification
+          </button>
+          <button
+            onClick={() => navigate("/recruiter")}
+            className="back-btn"
+          >
+            ← Back to Dashboard
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default NotificationDetails;
+export default RecruiterNotificationDetails;

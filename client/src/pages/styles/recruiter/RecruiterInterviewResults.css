@@ -1,0 +1,152 @@
+/* Overall container and base styling */
+.results-container {
+    background: #f4f7f9;
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+  }
+  
+  .main-heading {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+  
+  .error {
+    text-align: center;
+    color: red;
+    margin-bottom: 1.5rem;
+  }
+  
+  .no-results {
+    text-align: center;
+    color: #555;
+  }
+  
+  /* Interview card styling */
+  .interview-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .interview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .interview-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.3rem;
+  }
+  
+  .scheduled-date {
+    color: #555;
+    font-size: 0.9rem;
+  }
+  
+  .interview-description {
+    color: #555;
+    margin-bottom: 1rem;
+  }
+  
+  /* Section headings */
+  .section-heading {
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Table styling */
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  .results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  
+  .results-table th,
+  .results-table td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+    color: #555;
+  }
+  
+  .results-table th {
+    background-color: #f2f2f2;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  /* List styling */
+  .marks-list,
+  .answers-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  
+  .marks-list li,
+  .answers-list li {
+    margin-bottom: 0.25rem;
+  }
+  
+  /* Delete response button */
+  .delete-response-btn {
+    padding: 0.5rem;
+    background-color: #e74c3c;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-bottom: 0.5rem;
+  }
+  
+  .delete-response-btn:hover {
+    background-color: #c0392b;
+  }
+  
+  /* View details link inside the table */
+  .view-details-link {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    transition: color 0.2s ease;
+  }
+  
+  .view-details-link:hover {
+    color: #0056b3;
+  }
+  
+  /* Back button styling */
+  .back-btn-container {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .back-btn {
+    padding: 0.8rem 1.2rem;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .back-btn:hover {
+    background-color: #0056b3;
+  }
+  

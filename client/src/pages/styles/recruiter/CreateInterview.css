@@ -1,0 +1,142 @@
+/* Overall container with a soft background */
+.create-interview-container {
+    background: #f4f7f9;
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+    color: #333;
+    min-width: 900px;
+  }
+  
+  /* Card container */
+  .create-interview-card {
+    background: #fff;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Main heading styling */
+  .create-interview-card h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Form styling */
+  .create-interview-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  /* Form group styling */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  /* Input and select styling */
+  .form-input,
+  .form-select {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .form-textarea {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  /* Styling for each question group */
+  .question-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Add button styling */
+  .add-btn {
+    padding: 0.8rem 1rem;
+    background-color: #38bdf8;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+    align-self: flex-start;
+  }
+  
+  .add-btn:hover {
+    background-color: #2a9bd4;
+  }
+  
+  /* Candidate checkbox section styling */
+  .skills-group {
+    margin-bottom: 1rem; /* Extra space below skills group */
+  }
+  
+  .candidate-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Submit button styling */
+  .submit-btn {
+    padding: 0.8rem;
+    background-color: #38bdf8;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.2s ease;
+  }
+  
+  .submit-btn:hover {
+    background-color: #2a9bd4;
+  }
+  
+  /* Error message styling */
+  .error-message {
+    color: red;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  /* Styling for remove question button */
+.remove-btn {
+    padding: 0.6rem 1rem;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 0.5rem;
+    align-self: flex-start;
+  }
+  
+  .remove-btn:hover {
+    background-color: #c0392b;
+  }
+  

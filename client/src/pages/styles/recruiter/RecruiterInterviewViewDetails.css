@@ -1,38 +1,41 @@
+/* Ensure full-page background and base font */
 html, body {
+    height: 100%;
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
   }
   
+  /* Container with a soft background */
   .container {
     background: #f4f7f9;
     min-height: 100vh;
     padding: 2rem;
-    min-width: 700px;
   }
   
+  /* Centered card for interview details */
   .details-card {
     max-width: 700px;
     margin: 0 auto;
     background: #fff;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 2rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
     text-align: left;
   }
   
+  h3{
+    text-align: center;
+    color:#333;
+  }
+  /* Heading style */
   .details-card h2 {
     text-align: center;
+    margin-bottom: 1.5rem;
     color: #333;
-    margin-bottom: 1.5rem;
-  }
-
-  .details-card h3 {
-    text-align: center;
-    color: #000000;
-    margin-bottom: 1.5rem;
   }
   
+  /* Grouping styles for details */
   .detail-group {
     margin-bottom: 1.5rem;
   }
@@ -42,14 +45,15 @@ html, body {
     color: #555;
   }
   
-  .question-list, .candidate-list {
-    margin: 0;
+  /* Questions list styling */
+  .question-list {
+    list-style: decimal;
     padding-left: 1.5rem;
-    color: #555;
   }
   
-  .question-list li, .candidate-list li {
+  .question-list li {
     margin-bottom: 0.5rem;
+    color: #555;
   }
   
   .answer-type {
@@ -57,12 +61,19 @@ html, body {
     color: #777;
   }
   
+  /* Candidate list styling */
+  .candidate-list {
+    list-style: disc;
+    padding-left: 1.5rem;
+    color: #555;
+  }
+  
+  /* Button group styling */
   .button-group {
     display: flex;
     justify-content: space-around;
-    margin-top: 1.5rem;
-    flex-wrap: wrap;
     gap: 1rem;
+    margin-bottom: 1.5rem;
   }
   
   .action-btn {
@@ -71,8 +82,8 @@ html, body {
     border: none;
     border-radius: 5px;
     color: #fff;
-    cursor: pointer;
     font-weight: bold;
+    cursor: pointer;
     transition: background-color 0.2s ease;
   }
   
@@ -80,25 +91,39 @@ html, body {
     background-color: #2a9bd4;
   }
   
+  /* Back button styling */
   .back-link-container {
     text-align: center;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
+    background-color: #38bdf8;
   }
   
-  .back-link {
-    text-decoration: none;
-    color: #007bff;
+  .back-btn {
+    padding: 0.8rem 1.2rem;
+    background-color: #38bdf8;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
     font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
   }
   
+  .back-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Error and Loading message styles */
   .error {
-    color: red;
     text-align: center;
-    margin-top: 2rem;
+    color: red;
+    margin-top: 1rem;
   }
   
   .loading {
     text-align: center;
     margin-top: 2rem;
+    color: #333;
   }
   

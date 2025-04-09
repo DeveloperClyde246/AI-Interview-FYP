@@ -1,0 +1,148 @@
+/* Overall container with soft background */
+.edit-interview-container {
+    background: #f4f7f9;
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Centered card container */
+  .edit-interview-card {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Main heading style */
+  .edit-interview-card h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Form layout */
+  .edit-interview-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  /* Grouping for form elements */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  /* Input, textarea, and select styling */
+  .form-input,
+  .form-select {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .form-textarea {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  /* Question group styling for both existing and new questions */
+  .question-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* New questions have a dashed border */
+  .new-question {
+    border: 1px dashed #ccc;
+    padding: 0.5rem;
+    border-radius: 5px;
+  }
+  
+  /* Buttons styling */
+  .add-btn,
+  .remove-btn,
+  .submit-btn {
+    padding: 0.8rem 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+  }
+  
+  .add-btn {
+    background-color: #38bdf8;
+    color: #fff;
+    align-self: flex-start;
+  }
+  
+  .add-btn:hover {
+    background-color: #2a9bd4;
+  }
+  
+  .remove-btn {
+    background-color: #e74c3c;
+    color: #fff;
+    align-self: flex-start;
+  }
+  
+  .remove-btn:hover {
+    background-color: #c0392b;
+  }
+  
+  .submit-btn {
+    background-color: #38bdf8;
+    color: #fff;
+    width: 100%;
+  }
+  
+  .submit-btn:hover {
+    background-color: #2a9bd4;
+  }
+  
+  /* Back button styling */
+  .back-link-container {
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+  
+  .back-btn {
+    padding: 0.8rem 1.2rem;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .back-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Error message styling */
+  .error-message {
+    text-align: center;
+    color: red;
+    margin-bottom: 1rem;
+  }
+  

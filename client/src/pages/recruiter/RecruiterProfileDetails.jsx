@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import RecruiterNavbar from "../components/RecruiterNavbar"; 
+import RecruiterNavbar from "../components/RecruiterNavbar";
+import "../styles/recruiter/RecruiterProfileDetails.css";
 
 const RecruiterProfileDetails = () => {
   const [user, setUser] = useState(null);
@@ -24,21 +25,40 @@ const RecruiterProfileDetails = () => {
     fetchProfile();
   }, []);
 
-  if (!user || !recruiter) return <p>Loading...</p>;
+  if (!user || !recruiter) return <p className="loading">Loading...</p>;
 
   return (
-    <div>
+    <div className="profile-container">
       <RecruiterNavbar />
-      <h2>Recruiter Profile</h2>
-      <p><strong>Name:</strong> {user.name}</p>
-      <p><strong>Email:</strong> {user.email}</p>
-      <p><strong>Contact Number:</strong> {recruiter.contactNumber}</p>
-      <p><strong>Job Title:</strong> {recruiter.jobTitle}</p>
-      <p><strong>Date of Joining:</strong> {new Date(recruiter.dateOfJoining).toLocaleDateString()}</p>
-
-      <button onClick={() => navigate("/recruiter/profile/edit")}>Edit Profile</button>
-      <br />
-      <button onClick={() => navigate("/recruiter")}>Back to Dashboard</button>
+      <div className="profile-card">
+        <h2>Recruiter Profile</h2>
+        <div className="profile-info">
+          <p>
+            <strong>Name:</strong> {user.name}
+          </p>
+          <p>
+            <strong>Email:</strong> {user.email}
+          </p>
+          <p>
+            <strong>Contact Number:</strong> {recruiter.contactNumber || "Not provided"}
+          </p>
+          <p>
+            <strong>Job Title:</strong> {recruiter.jobTitle || "N/A"}
+          </p>
+          <p>
+            <strong>Date of Joining:</strong>{" "}
+            {new Date(recruiter.dateOfJoining).toLocaleDateString()}
+          </p>
+        </div>
+        <div className="profile-buttons">
+          <button className="action-btn" onClick={() => navigate("/recruiter/profile/edit")}>
+            Edit Profile
+          </button>
+          <button className="action-btn" onClick={() => navigate("/recruiter")}>
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

@@ -93,6 +93,7 @@ const CandidateEditProfile = () => {
 
       if (res.status === 200) {
         setSuccess("Profile updated successfully!");
+        navigate("/candidate/profile");
       }
     } catch (err) {
       console.error("Error updating profile:", err);

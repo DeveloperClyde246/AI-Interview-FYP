@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
-import RecruiterNavbar from "../components/RecruiterNavbar"; 
+import RecruiterNavbar from "../components/RecruiterNavbar";
+import "../styles/recruiter/RecruiterManageCandidate.css";
+import { useNavigate } from "react-router-dom";
 
 const RecruiterManageCandidate = () => {
   const { id } = useParams();
@@ -9,6 +11,7 @@ const RecruiterManageCandidate = () => {
   const [allCandidates, setAllCandidates] = useState([]);
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const fetchDetails = async () => {
     try {
@@ -61,52 +64,69 @@ const RecruiterManageCandidate = () => {
     );
   };
 
-  if (!interview) return <p>Loading...</p>;
+  if (!interview) return <p className="loading">Loading...</p>;
 
+  // Filter for candidates not already assigned
   const unassigned = allCandidates.filter(
     (c) => !interview.candidates.some((i) => i._id === c._id)
   );
 
   return (
-    <div>
+    <div className="manage-candidate-container">
       <RecruiterNavbar />
-      <h2>Manage Candidates for: {interview.title}</h2>
+      <div className="manage-candidate-card">
+        <h2>Manage Candidates for: {interview.title}</h2>
+        
+        <section className="assigned-section">
+          <h3>Assigned Candidates</h3>
+          {interview.candidates.length > 0 ? (
+            <ul className="assigned-list">
+              {interview.candidates.map((c) => (
+                <li key={c._id}>
+                  <span>
+                    {c.name} ({c.email})
+                  </span>
+                  <button onClick={() => handleUnassign(c._id)}>Unassign</button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No candidate assigned.</p>
+          )}
+        </section>
 
-      <h3>Assigned Candidates</h3>
-      <ul>
-        {interview.candidates.length > 0 ? (
-          interview.candidates.map((c) => (
-            <li key={c._id}>
-              {c.name} ({c.email})
-              <button onClick={() => handleUnassign(c._id)}>Unassign</button>
-            </li>
-          ))
-        ) : (
-          <p>No candidate assigned.</p>
-        )}
-      </ul>
-
-      <h3>Add More Candidates</h3>
-      {unassigned.length === 0 ? (
-        <p>All users are already assigned.</p>
-      ) : (
-        <>
-          {unassigned.map((c) => (
-            <div key={c._id}>
-              <input
-                type="checkbox"
-                checked={selectedCandidates.includes(c._id)}
-                onChange={() => toggleCandidate(c._id)}
-              />
-              {c.name} ({c.email})
-            </div>
-          ))}
-          <button onClick={handleAddCandidates}>Add Selected Candidates</button>
-        </>
-      )}
-      <br />
-      <Link to={`/recruiter/interview/${id}`}>Back to Interview</Link>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+        <section className="unassigned-section">
+          <h3>Add More Candidates</h3>
+          {unassigned.length === 0 ? (
+            <p>All users are already assigned.</p>
+          ) : (
+            <>
+              {unassigned.map((c) => (
+                <div key={c._id} className="unassigned-item">
+                  <input
+                    type="checkbox"
+                    checked={selectedCandidates.includes(c._id)}
+                    onChange={() => toggleCandidate(c._id)}
+                  />
+                  <span>
+                    {c.name} ({c.email})
+                  </span>
+                </div>
+              ))}
+              <button onClick={handleAddCandidates} className="action-btn">
+                Add Selected Candidates
+              </button>
+            </>
+          )}
+        </section>
+        
+        <div className="back-link-container">
+          <button onClick={() => navigate(`/recruiter/interview/${id}`)} className="back-btn">
+            ← Back to Interview
+          </button>
+        </div>
+        {error && <p className="error">{error}</p>}
+      </div>
     </div>
   );
 };

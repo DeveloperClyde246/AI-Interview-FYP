@@ -1,0 +1,63 @@
+/* Overall container with soft background */
+.profile-container {
+    background: #f4f7f9;
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Centered card container for profile details */
+  .profile-card {
+    background: #fff;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    min-width: 700px;
+  }
+  
+  /* Main heading style */
+  .profile-card h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  /* Candidate info styling */
+  .profile-info p {
+    margin: 0.5rem 0;
+    color: #555;
+  }
+  
+  /* Button container styling */
+  .profile-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  
+  /* Action buttons styling */
+  .action-btn {
+    padding: 0.8rem 1.2rem;
+    background-color: #38bdf8;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .action-btn:hover {
+    background-color: #2a9bd4;
+  }
+  
+  /* Loading text styling */
+  .loading {
+    text-align: center;
+    margin-top: 2rem;
+    color: #333;
+  }
+  

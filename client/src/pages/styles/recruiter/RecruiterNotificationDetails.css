@@ -1,0 +1,98 @@
+/* Ensure full-page background and base typography */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Container with soft background */
+  .notification-details-container {
+    background: #f4f7f9;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+  
+  /* Card styling for notification details */
+  .notification-details-card {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  }
+  
+  /* Header styling */
+  .notification-details-card h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  /* Detail grouping styling */
+  .detail-group p {
+    margin: 0.5rem 0;
+    color: #555;
+  }
+  
+  /* Button group styling -- using column layout for stacking */
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    align-items: center;
+  }
+  
+  /* Delete button styling */
+  .delete-btn {
+    padding: 0.8rem 1.2rem;
+    background-color: #e74c3c;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .delete-btn:hover:enabled {
+    background-color: #c0392b;
+  }
+  
+  .delete-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Back button styling */
+  .back-btn {
+    padding: 0.8rem 1.2rem;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .back-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Error and loading styling */
+  .error {
+    text-align: center;
+    color: red;
+    margin-top: 1rem;
+  }
+  
+  .loading {
+    text-align: center;
+    margin-top: 2rem;
+    color: #333;
+  }
+  

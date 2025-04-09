@@ -1,0 +1,115 @@
+/* Overall container with soft background */
+.edit-profile-container {
+    background: #f4f7f9;
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Centered card container for profile editing */
+  .edit-profile-card {
+    background: #fff;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    min-width: 700px;
+  }
+  
+  /* Heading styling */
+  .edit-profile-card h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  /* Form layout */
+  .edit-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  
+  /* Form group styling */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  /* Input styling */
+  .form-input {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  /* Button group styling */
+  .button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  /* Submit button styling */
+  .submit-btn {
+    flex: 1;
+    background-color: #38bdf8;
+    color: #fff;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .submit-btn:hover {
+    background-color: #2a9bd4;
+  }
+  
+  /* Back button styling */
+  .back-btn {
+    flex: 1;
+    background-color: #555;
+    color: #fff;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .back-btn:hover {
+    background-color: #333;
+  }
+  
+  /* Message styling */
+  .error-message {
+    text-align: center;
+    color: red;
+    margin-bottom: 1rem;
+  }
+  
+  .success-message {
+    text-align: center;
+    color: green;
+    margin-bottom: 1rem;
+  }
+  
+  /* Loading text styling */
+  .loading {
+    text-align: center;
+    margin-top: 2rem;
+    color: #333;
+  }
+  

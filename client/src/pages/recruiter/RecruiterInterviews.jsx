@@ -77,10 +77,11 @@ const RecruiterInterviews = () => {
           ))
         )}
       </div>
+      <br/>
 
-      <Link to="/recruiter/create-interview" className="create-link">
+      <button className="create-btn" onClick={() => navigate("/recruiter/create-interview")}>
         Create New Interview
-      </Link>
+      </button>
     </div>
   );
 };
