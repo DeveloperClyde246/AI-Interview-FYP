@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import CandidateNavbar from "../components/CandidateNavbar";
@@ -166,13 +166,27 @@ const CandidateEditProfile = () => {
           <div className="form-group skills-group">
             <label>Skills:</label>
             {form.skills.map((skill, index) => (
-              <input
-                key={index}
-                value={skill}
-                onChange={(e) => handleSkillChange(index, e.target.value)}
-                placeholder={`Skill ${index + 1}`}
-                className="form-input"
-              />
+              <div key={index} className="skill-group">
+                <input
+                  value={skill}
+                  onChange={(e) => handleSkillChange(index, e.target.value)}
+                  placeholder={`Skill ${index + 1}`}
+                  className="form-input"
+                />
+                {form.skills.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updatedSkills = [...form.skills];
+                      updatedSkills.splice(index, 1);
+                      setForm({ ...form, skills: updatedSkills });
+                    }}
+                    className="remove-btn"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
             ))}
             <button type="button" onClick={addSkill} className="add-btn">
               + Add Skill

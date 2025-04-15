@@ -139,4 +139,28 @@
     text-align: center;
     margin-bottom: 1rem;
   }
+  /* (Existing styles remain unchanged; add these styles to support skill-group) */
+.skill-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Reuse or adjust remove-btn styles if needed */
+.remove-btn {
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.remove-btn:hover {
+  background-color: #c0392b;
+}
+
   

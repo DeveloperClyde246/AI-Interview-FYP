@@ -129,7 +129,7 @@ const RecruiterInterviewEdit = () => {
             />
           </div>
           <div className="form-group">
-            <label>Answer Duration (seconds):</label>
+            <label>Answer Duration (Minutes):</label>
             <input
               type="number"
               name="answerDuration"
@@ -167,7 +167,6 @@ const RecruiterInterviewEdit = () => {
                   className="form-select"
                 >
                   <option value="text">Text</option>
-                  <option value="file">File</option>
                   <option value="recording">Recording</option>
                 </select>
                 {existingQuestions.length > 1 && (

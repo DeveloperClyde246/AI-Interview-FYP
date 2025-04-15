@@ -107,7 +107,7 @@ const RecruiterCandidateDetails = () => {
                           target="_blank"
                           rel="noreferrer"
                         >
-                          Streamlit Analyze
+                          Analysis Details
                         </a>
                       </>
                     ) : (

@@ -62,9 +62,26 @@ router.get("/notifications/:id", async (req, res) => {
   }
 });
 
-// ✅ Delete Notification
+// Delete Notification
 router.delete("/notifications/:id/delete", async (req, res) => {
   try {
+    const notification = await Notification.findById(req.params.id);
+    if (!notification) {
+      return res.status(404).json({ message: "Notification not found" });
+    }
+    // If the notification relates to an interview, check the interviewDate.
+    if (notification.interviewDate) {
+      const interviewDate = new Date(notification.interviewDate);
+      const now = new Date();
+      const timeDiff = interviewDate - now;
+      // If the interview is in the future and is within 24 hours, prevent deletion.
+      if (timeDiff > 0 && timeDiff <= 24 * 60 * 60 * 1000) {
+        return res.status(403).json({
+          message:
+            "You cannot delete this notification because the interview is happening within 24 hours.",
+        });
+      }
+    }
     await Notification.findByIdAndDelete(req.params.id);
     res.json({ message: "Notification deleted successfully" });
   } catch (error) {
