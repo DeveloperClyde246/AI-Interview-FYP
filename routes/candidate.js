@@ -293,7 +293,7 @@ router.post("/interview/:id/submit",
 
       // prevent double submit
       if (interview.responses.some(r => r.candidate.toString() === candidateId)) {
-        return res.status(400).json({ message: "You have already submitted answers." });
+        return res.status(400).json({ message: "Please wait analysis to finish." });
       }
 
       // collect answers + video URLs
@@ -392,9 +392,13 @@ router.post("/interview/:id/submit",
       const scores = analyses.map(a =>
         typeof a.final_average_score === "number" ? a.final_average_score : 0
       );
-      resp.marks = scores.length
-        ? Math.round(scores.reduce((sum, v) => sum + v, 0) / scores.length)
-        : null;
+      if (scores.length) {
+        const avgRaw = scores.reduce((sum, v) => sum + v, 0) / scores.length;
+        // keep two decimals
+        resp.marks = Number(avgRaw.toFixed(2));
+      } else {
+        resp.marks = null;
+      }
 
       await interview.save();
 

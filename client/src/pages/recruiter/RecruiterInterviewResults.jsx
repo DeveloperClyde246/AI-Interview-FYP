@@ -91,22 +91,25 @@ const RecruiterInterviewResults = () => {
                           )}
                         </td>
                         <td>
-                          {response && response.videoMarks?.length > 0 ? (
-                            <>
-                              <ul className="marks-list">
-                                {response.videoMarks.map((mark, i) => (
+                        {response && response.analysis?.length > 0 ? (
+                          <>
+                            <ul className="marks-list">
+                              {response.analysis.map((analysisEntry, i) => {
+                                const vidScore = analysisEntry.final_average_score ?? analysisEntry.marks ?? 0;
+                                return (
                                   <li key={i}>
-                                    Video {i + 1}: {mark} marks
+                                    Video {i + 1}: {(vidScore).toFixed(2)} marks
                                   </li>
-                                ))}
-                              </ul>
-                              <strong className="average-mark">
-                                Avg: {response.marks} marks
-                              </strong>
-                            </>
-                          ) : (
-                            <i>—</i>
-                          )}
+                                );
+                              })}
+                            </ul>
+                            <strong className="average-mark">
+                              Avg: {response.marks ?? "N/A"} marks
+                            </strong>
+                          </>
+                        ) : (
+                          <i>—</i>
+                        )}
                         </td>
                         <td>
                           {response ? (

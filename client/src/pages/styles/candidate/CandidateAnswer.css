@@ -34,6 +34,7 @@
   /* Each question block */
   .question-block {
     padding-bottom: 1rem;
+    color: #333;
     border-bottom: 1px solid #eee;
   }
   
@@ -151,3 +152,14 @@
     color: #333;
   }
   
+
+  .timer {
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: #e74c3c;              /* red-ish to stand out */
+    background: #ffecec;         /* very light pink background */
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+  }
