@@ -1,3 +1,4 @@
+// src/pages/CandidateNotificationDetails.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -19,19 +20,16 @@ const CandidateNotificationDetails = () => {
           { withCredentials: true }
         );
 
-        if (res.status === 200) {
-          setNotification(res.data.notification);
+        const note = res.data.notification;
+        setNotification(note);
 
-          // Check if the interview is within 24 hours (if applicable)
-          if (res.data.interviewDate) {
-            const interviewDate = new Date(res.data.interviewDate);
-            const now = new Date();
-            const timeDiff = interviewDate - now;
-
-            // Disable delete if interview within 24 hours
-            if (timeDiff <= 24 * 60 * 60 * 1000 && timeDiff > 0) {
-              setDeletable(false);
-            }
+        // Now read note.interviewDate, not res.data.interviewDate
+        if (note.interviewDate) {
+          const interviewDate = new Date(note.interviewDate);
+          const now = new Date();
+          const timeDiff = interviewDate - now;
+          if (timeDiff > 0 && timeDiff <= 24 * 60 * 60 * 1000) {
+            setDeletable(false);
           }
         }
       } catch (err) {
@@ -43,24 +41,17 @@ const CandidateNotificationDetails = () => {
     fetchNotification();
   }, [id]);
 
-  // Handle Notification Deletion
   const handleDelete = async () => {
     try {
-      const res = await axios.delete(
+      await axios.delete(
         `http://localhost:5000/candidate/notifications/${id}/delete`,
         { withCredentials: true }
       );
-
-      if (res.status === 200) {
-        alert("✅ Notification deleted successfully!");
-        navigate("/candidate");
-      }
+      alert("✅ Notification deleted successfully!");
+      navigate("/candidate");
     } catch (err) {
       if (err.response && err.response.status === 403) {
-        alert(
-          err.response.data.message ||
-            "You cannot delete this notification because the interview is happening within 24 hours."
-        );
+        alert(err.response.data.message);
       } else {
         console.error("❌ Error deleting notification:", err);
         alert("Error deleting notification. Please try again.");
@@ -68,13 +59,8 @@ const CandidateNotificationDetails = () => {
     }
   };
 
-  if (error) {
-    return <p className="error">{error}</p>;
-  }
-
-  if (!notification) {
-    return <p className="loading">Loading...</p>;
-  }
+  if (error) return <p className="error">{error}</p>;
+  if (!notification) return <p className="loading">Loading...</p>;
 
   return (
     <div className="container">
@@ -82,16 +68,18 @@ const CandidateNotificationDetails = () => {
       <div className="notification-card">
         <h2>Notification Details</h2>
         <div className="detail-group">
-          <p>
-            <strong>Message:</strong> {notification.message}
-          </p>
+          <p><strong>Message:</strong> {notification.message}</p>
           <p>
             <strong>Created At:</strong>{" "}
             {new Date(notification.createdAt).toLocaleString()}
           </p>
         </div>
         <div className="actions">
-          <button onClick={handleDelete} disabled={!deletable} className="delete-btn">
+          <button
+            onClick={handleDelete}
+            disabled={!deletable}
+            className="delete-btn"
+          >
             Delete Notification
           </button>
         </div>

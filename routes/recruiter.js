@@ -20,9 +20,10 @@ router.get("/", async (req, res) => {
   try {
     console.log("📥 Recruiter dashboard accessed");
     const recruiterId = req.user.id;
-    const now = new Date();
-    const nextDay = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours ahead
+    const now       = new Date();
+    const nextDay   = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24h ahead
 
+    // 1) Create “upcoming” notifications (with interviewDate)
     const upcomingInterviews = await Interview.find({
       recruiterId,
       scheduled_date: { $gte: now, $lte: nextDay },
@@ -32,55 +33,63 @@ router.get("/", async (req, res) => {
       const formattedDate = new Date(interview.scheduled_date).toLocaleString();
       const recruiterMsg = `You have an interview titled "${interview.title}" scheduled for ${formattedDate}.`;
 
-      // Create notification with interviewDate
-      const recruiterNotification = await Notification.findOne({
-        userId: recruiterId,
-        message: recruiterMsg,
-      });
-
-      if (!recruiterNotification) {
+      // recruiter notification
+      if (
+        !(await Notification.exists({ userId: recruiterId, message: recruiterMsg }))
+      ) {
         await Notification.create({
-          userId: recruiterId,
-          message: recruiterMsg,
-          status: "unread",
-          interviewDate: interview.scheduled_date,
+          userId:        recruiterId,
+          message:       recruiterMsg,
+          status:        "unread",
+          interviewDate: interview.scheduled_date,  // ← store it here
         });
       }
 
+      // candidate notifications
       for (const candidate of interview.candidates) {
-        const candidateMsg = `You have an interview titled "${interview.title}" scheduled for ${formattedDate}.`;
-
-        const existing = await Notification.findOne({
-          userId: candidate._id,
-          message: candidateMsg,
-        });
-
-        if (!existing) {
-          await Notification.create({
+        const candidateMsg = recruiterMsg;
+        if (
+          !(await Notification.exists({
             userId: candidate._id,
             message: candidateMsg,
-            status: "unread",
-            interviewDate: interview.scheduled_date,
+          }))
+        ) {
+          await Notification.create({
+            userId:        candidate._id,
+            message:       candidateMsg,
+            status:        "unread",
+            interviewDate: interview.scheduled_date,  // ← and here
           });
         }
       }
     }
 
+    // 2) Fetch all notifications for the recruiter
     const notifications = await Notification.find({ userId: recruiterId }).sort({
       createdAt: -1,
     });
 
-    const interviews = await Interview.find({ recruiterId })
+    // 3) Fetch and massage the interviews list
+    //    we use .lean() so we can freely add new properties
+    const rawInterviews = await Interview.find({ recruiterId })
       .populate("candidates", "name email")
-      .sort({ scheduled_date: -1 });
+      .sort({ scheduled_date: -1 })
+      .lean();
 
+    // 4) Add an `interviewDate` alias alongside your scheduled_date
+    const interviews = rawInterviews.map((iv) => ({
+      ...iv,
+      interviewDate: iv.scheduled_date,  // now your frontend sees interviewDate directly
+    }));
+
+    // 5) Return everything
     res.json({
-      username: req.cookies.username,
+      username:      req.cookies.username,
       notifications,
       interviews,
     });
   } catch (error) {
-    console.error("❌ Error loading recruiter dashboard:", error.message);
+    console.error("❌ Error loading recruiter dashboard:", error);
     res.status(500).json({ message: "Error loading dashboard" });
   }
 });
@@ -106,19 +115,27 @@ router.delete("/notifications/:id/delete", async (req, res) => {
     if (!notification) {
       return res.status(404).json({ message: "Notification not found" });
     }
-    // If the notification relates to an interview, check the interviewDate.
+
+    // Make sure we have a real Date here
     if (notification.interviewDate) {
-      const interviewDate = new Date(notification.interviewDate);
-      const now = new Date();
-      const timeDiff = interviewDate - now;
-      // If the interview is in the future and is within 24 hours, prevent deletion.
-      if (timeDiff > 0 && timeDiff <= 24 * 60 * 60 * 1000) {
+      const interviewDate = new Date(notification.interviewDate).getTime();
+      const nowMs         = Date.now();
+      const diffMs        = interviewDate - nowMs;
+
+      console.log(
+        `🔍 interviewDate: ${interviewDate}, now: ${nowMs}, diffMs: ${diffMs}`
+      );
+
+      // If the interview is in the future and ≤ 24h away, block the delete
+      const twentyFourHrs = 24 * 60 * 60 * 1000;
+      if (!isNaN(diffMs) && diffMs > 0 && diffMs <= twentyFourHrs) {
         return res.status(403).json({
           message:
             "You cannot delete this notification because the interview is happening within 24 hours.",
         });
       }
     }
+
     await Notification.findByIdAndDelete(req.params.id);
     res.json({ message: "Notification deleted successfully" });
   } catch (error) {
