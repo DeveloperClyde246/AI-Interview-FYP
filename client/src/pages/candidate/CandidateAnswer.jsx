@@ -121,13 +121,13 @@ const CandidateAnswer = () => {
   // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Check if videos are still uploading or not all recordings are uploaded
     if (isUploading || !allRecordingsUploaded) {
       alert("Please wait for all video uploads to complete before submitting.");
       return;
     }
-
+  
     const formData = new FormData();
     answers.forEach((answer, index) => {
       if (recordedVideos[index]) {
@@ -138,16 +138,18 @@ const CandidateAnswer = () => {
         formData.append(`answers[${index}]`, answer);
       }
     });
-
+  
+    alert("Please wait for analysis to complete. It may take a few minutes. Will prompt after completion.");
     try {
       const res = await axios.post(
         `http://localhost:5000/candidate/interview/${id}/submit`,
         formData,
         { withCredentials: true }
       );
-
+  
       if (res.status === 200) {
-        alert(`Answers submitted successfully! Average Mark: ${res.data.avgMark || "N/A"}`);
+        // ← read `marks` instead of `avgMark`
+        alert(`Answers submitted successfully! Average Mark: ${res.data.marks ?? "N/A"}`);
         navigate("/candidate/interviews");
       }
     } catch (err) {

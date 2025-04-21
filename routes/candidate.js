@@ -283,139 +283,129 @@ const upload = multer({
 });
 
 // ✅ Submit Interview Answers
-router.post("/interview/:id/submit", upload.array("fileAnswers", 5), async (req, res) => {
-  try {
-    const candidateId = req.user.id;
-    let processedAnswers = [];
-    let videoURLs = [];
+router.post("/interview/:id/submit",
+  upload.array("fileAnswers", 5),
+  async (req, res) => {
+    try {
+      const candidateId = req.user.id;
+      const interview   = await Interview.findById(req.params.id);
+      if (!interview) return res.status(404).json({ message: "Interview not found" });
 
-    // ✅ Check if the candidate has already submitted a response
-    const interview = await Interview.findById(req.params.id);
-    if (!interview) {
-      return res.status(404).json({ message: "Interview not found" });
-    }
-
-    const existingResponse = interview.responses.find(
-      (response) => response.candidate.toString() === candidateId
-    );
-
-    if (existingResponse) {
-      return res.status(400).json({ message: "You have already submitted answers for this interview." });
-    }
-
-    // ✅ Process file uploads
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        processedAnswers.push(file.path);
+      // prevent double submit
+      if (interview.responses.some(r => r.candidate.toString() === candidateId)) {
+        return res.status(400).json({ message: "You have already submitted answers." });
       }
-    }
 
-    if (req.body.answers) {
-      for (const answer of req.body.answers) {
-        processedAnswers.push(answer);
-    
-        if (answer.startsWith("http") && answer.includes("video/upload")) {
-          // Convert to mp4 via Cloudinary transformation
-          const mp4URL = answer
+      // collect answers + video URLs
+      const processedAnswers = [];
+      const videoURLs        = [];
+
+      for (let f of req.files || []) {
+        processedAnswers.push(f.path);
+      }
+      for (let ans of req.body.answers || []) {
+        processedAnswers.push(ans);
+        if (ans.startsWith("http") && ans.includes("/upload/")) {
+          // transform to mp4 URL on Cloudinary
+          const mp4 = ans
             .replace("/upload/", "/upload/f_mp4/")
-            .replace(".webm", ".mp4"); // Optional, just for consistency
-    
-          videoURLs.push(mp4URL);
+            .replace(/\.webm$/, ".mp4");
+          videoURLs.push(mp4);
         }
       }
-    }
 
-    const submittedAt = new Date();
-    const scheduledTime = new Date(interview.scheduled_date);
-    const isLate = submittedAt > scheduledTime;
+      // create a new sub‑document
+      const submittedAt = new Date();
+      const isLate      = submittedAt > interview.scheduled_date;
+      interview.responses.push({
+        candidate:      candidateId,
+        answers:        processedAnswers,
+        analysis:       [],          // ← AI results will go here
+        marks:          null,
+        status:         isLate ? "submitted late" : "submitted",
+        submitDateTime: submittedAt
+      });
+      await interview.save();
 
-    // ✅ Save response with null marks initially
-    const newResponse = {
-      candidate: candidateId,
-      answers: processedAnswers,
-      videoMarks: [],
-      marks: null,
-      status: isLate ? "submitted late" : "submitted", // ✅ set status here
-      submitDateTime: submittedAt,
-    };
+      // prepare temp dir
+      const tmpDir = path.join(__dirname, "../temp");
+      fs.mkdirSync(tmpDir, { recursive: true });
 
-    interview.responses.push(newResponse);
-    await interview.save();
+      const analyses = [];
 
-    // ✅ Analyze video responses
-    let videoMarks = [];
+      // for each video URL run AI analysis
+      for (let url of videoURLs) {
+        try {
+          // detect extension
+          const { pathname } = new URL(url);
+          const ext = path.extname(pathname) || ".mp4";
+          const downloadPath = path.join(tmpDir, `${uuidv4()}${ext}`);
 
+          // download
+          const writer = fs.createWriteStream(downloadPath);
+          const resp   = await axios.get(url, { responseType: "stream" });
+          await new Promise((ok, no) => {
+            resp.data.pipe(writer);
+            writer.on("finish", ok);
+            writer.on("error",  no);
+          });
 
-    const tempDir = path.join(__dirname, "../temp");
-    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
+          // convert if not already mp4
+          let mp4Path = downloadPath;
+          if (ext.toLowerCase() !== ".mp4") {
+            mp4Path = downloadPath.replace(ext, ".mp4");
+            await new Promise((ok, no) => {
+              ffmpeg(downloadPath)
+                .output(mp4Path)
+                .on("end", ok)
+                .on("error", no)
+                .run();
+            });
+          }
 
-    for (const url of videoURLs) {
-      try {
-        // 1. Download the webm video
-        const tempWebmPath = path.join(__dirname, "../temp", `${uuidv4()}.webm`);
-        const writer = fs.createWriteStream(tempWebmPath);
-        const videoStream = await axios.get(url, { responseType: "stream" });
-        await new Promise((resolve, reject) => {
-          videoStream.data.pipe(writer);
-          writer.on("finish", resolve);
-          writer.on("error", reject);
-        });
-    
-        // 2. Convert to MP4
-        const tempMp4Path = tempWebmPath.replace(".webm", ".mp4");
-        await new Promise((resolve, reject) => {
-          ffmpeg(tempWebmPath)
-            .output(tempMp4Path)
-            .on("end", resolve)
-            .on("error", reject)
-            .run();
-        });
-        
-        const form = new FormData();
-        form.append("video", fs.createReadStream(tempMp4Path));
+          // call your Flask AI endpoint
+          const form = new FormData();
+          form.append("file", fs.createReadStream(mp4Path));
+          const aiRes = await axios.post(
+            "http://localhost:5001/analyze",
+            form,
+            { headers: form.getHeaders(), timeout: 180_000 }
+          );
 
-        const aiRes = await axios.post("http://localhost:5001/analyze-video", form, {
-          headers: form.getHeaders(),
-          timeout: 18000000,
-        });
-        // // 3. Send to Flask AI API
-        // const aiRes = await axios.post("http://localhost:5001/analyze-video", {
-        //   videoURL: `file://${tempMp4Path}`, // or use fs.readFile if API accepts buffer
-        // }, { timeout: 60000 });
-    
-        const { marks } = aiRes.data;
-        videoMarks.push(marks);
-    
-        // 4. Cleanup temp files
-        fs.unlinkSync(tempWebmPath);
-        fs.unlinkSync(tempMp4Path);
-    
-      } catch (err) {
-        console.error("❌ AI error or FFmpeg error:", err.message);
+          analyses.push(aiRes.data);
+
+          // cleanup
+          fs.unlinkSync(downloadPath);
+          if (mp4Path !== downloadPath) fs.unlinkSync(mp4Path);
+        }
+        catch (err) {
+          console.error("AI analysis failed for", url, err.message);
+          analyses.push({ error: err.message });
+        }
       }
+
+      // write analyses back into the same sub‑doc and compute marks
+      const resp = interview.responses.find(r => r.candidate.toString() === candidateId);
+      resp.analysis = analyses;
+
+      // average of analysis[].final_average_score, defaulting missing → 0
+      const scores = analyses.map(a =>
+        typeof a.final_average_score === "number" ? a.final_average_score : 0
+      );
+      resp.marks = scores.length
+        ? Math.round(scores.reduce((sum, v) => sum + v, 0) / scores.length)
+        : null;
+
+      await interview.save();
+
+      return res.json({ message: "Submitted & analyzed", marks: resp.marks, analyses });
     }
-
-    // ✅ Calculate average mark
-    const avgMark = videoMarks.length > 0 ? Math.round(videoMarks.reduce((a, b) => a + b, 0) / videoMarks.length) : null;
-
-    // ✅ Update response with marks
-    await Interview.findOneAndUpdate(
-      { _id: req.params.id, "responses.candidate": candidateId },
-      {
-        $set: {
-          "responses.$.videoMarks": videoMarks,
-          "responses.$.marks": avgMark,
-        },
-      },
-      { new: true }
-    );
-
-    res.json({ message: "Answers submitted successfully", avgMark });
-  } catch (error) {
-    console.error("❌ Error submitting answers:", error.message);
-    res.status(500).json({ message: "Error submitting answers" });
+    catch (err) {
+      console.error("❌ submit error:", err);
+      return res.status(500).json({ message: "Server error", error: err.message });
+    }
   }
-});
+);
 
 
 //---------------faq pages------------------//
