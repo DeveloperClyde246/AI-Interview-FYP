@@ -1,3 +1,4 @@
+// src/pages/RecruiterInterviewResults.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
@@ -11,9 +12,10 @@ const RecruiterInterviewResults = () => {
 
   const fetchResults = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/recruiter/interview-results", {
-        withCredentials: true,
-      });
+      const res = await axios.get(
+        "http://localhost:5000/recruiter/interview-results",
+        { withCredentials: true }
+      );
       setInterviews(res.data.interviews);
     } catch (err) {
       console.error("Error loading results:", err);
@@ -26,19 +28,20 @@ const RecruiterInterviewResults = () => {
   }, []);
 
   const handleDeleteResponse = async (interviewId, candidateId) => {
-    if (window.confirm("Are you sure you want to delete this response?")) {
-      try {
-        await axios.post(
-          `http://localhost:5000/recruiter/interview/${interviewId}/delete-response`,
-          { candidateId },
-          { withCredentials: true }
-        );
-        alert("Response deleted.");
-        fetchResults();
-      } catch (err) {
-        alert("Error deleting response.");
-        console.error(err);
-      }
+    if (!window.confirm("Are you sure you want to delete this response?")) {
+      return;
+    }
+    try {
+      await axios.post(
+        `http://localhost:5000/recruiter/interview/${interviewId}/delete-response`,
+        { candidateId },
+        { withCredentials: true }
+      );
+      alert("Response deleted.");
+      fetchResults();
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting response.");
     }
   };
 
@@ -47,6 +50,7 @@ const RecruiterInterviewResults = () => {
       <RecruiterNavbar />
       <h2 className="main-heading">Interview Analysis Results</h2>
       {error && <p className="error">{error}</p>}
+
       {interviews.length === 0 ? (
         <p className="no-results">No interviews found.</p>
       ) : (
@@ -75,81 +79,116 @@ const RecruiterInterviewResults = () => {
                 </thead>
                 <tbody>
                   {interview.candidates.map((candidate) => {
+                    // find the matching response (compare as strings)
                     const response = interview.responses.find(
-                      (r) => r.candidate?._id === candidate._id
+                      (r) =>
+                        r.candidate &&
+                        r.candidate._id.toString() === candidate._id.toString()
                     );
+
+                    // calculate per-video marks if analysis exists
+                    const perVideoMarks =
+                      response?.analysis?.map((a, i) =>
+                        (a.final_average_score ?? a.marks ?? 0).toFixed(2)
+                      ) || [];
 
                     return (
                       <tr key={candidate._id}>
                         <td>{candidate.name}</td>
                         <td>{candidate.email}</td>
                         <td>
+                          {response
+                            ? response.status === "submitted late"
+                              ? "Submitted Late"
+                              : "Submitted"
+                            : "Pending"}
+                        </td>
+
+                        {/* ── Marks */}
+                        <td>
                           {response ? (
-                            response.status === "submitted late" ? "Submitted Late" : "Submitted"
+                            response.analysis && response.analysis.length > 0 ? (
+                              <>
+                                <ul className="marks-list">
+                                  {perVideoMarks.map((m, idx) => (
+                                    <li key={idx}>
+                                      Video {idx + 1}: {m}{" "}
+                                      <small>marks</small>
+                                    </li>
+                                  ))}
+                                </ul>
+                                <strong className="average-mark">
+                                  Avg:{" "}
+                                  {response.marks != null
+                                    ? response.marks.toFixed(2)
+                                    : "N/A"}{" "}
+                                  marks
+                                </strong>
+                              </>
+                            ) : (
+                              <em>No marks yet</em>
+                            )
                           ) : (
-                            "Pending"
+                            <em>—</em>
                           )}
                         </td>
+
+                        {/* ── Answers */}
                         <td>
-                        {response && response.analysis?.length > 0 ? (
-                          <>
-                            <ul className="marks-list">
-                              {response.analysis.map((analysisEntry, i) => {
-                                const vidScore = analysisEntry.final_average_score ?? analysisEntry.marks ?? 0;
-                                return (
-                                  <li key={i}>
-                                    Video {i + 1}: {(vidScore).toFixed(2)} marks
+                          {response ? (
+                            response.answers && response.answers.length > 0 ? (
+                              <ul className="answers-list">
+                                {response.answers.map((ans, idx) => (
+                                  <li key={idx} style={{ marginBottom: "0.5rem" }}>
+                                    {ans.startsWith("http") ? (
+                                      <a
+                                        href={ans}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="view-link"
+                                      >
+                                        View
+                                      </a>
+                                    ) : (
+                                      <span className="text-answer">{ans}</span>
+                                    )}
                                   </li>
-                                );
-                              })}
-                            </ul>
-                            <strong className="average-mark">
-                              Avg: {response.marks ?? "N/A"} marks
-                            </strong>
-                          </>
-                        ) : (
-                          <i>—</i>
-                        )}
-                        </td>
-                        <td>
-                          {response ? (
-                            <ul className="answers-list">
-                              {response.answers.map((ans, i) => (
-                                <li key={i}>
-                                  {ans.startsWith("http") ? (
-                                    <a href={ans} target="_blank" rel="noreferrer">
-                                      View
-                                    </a>
-                                  ) : (
-                                    ans
-                                  )}
-                                </li>
-                              ))}
-                            </ul>
+                                ))}
+                              </ul>
+                            ) : (
+                              <em>No answers</em>
+                            )
                           ) : (
-                            <i>—</i>
+                            <em>—</em>
                           )}
                         </td>
+
+                        {/* ── Actions */}
                         <td>
-                          {response && (
+                          {response ? (
                             <>
                               <button
                                 className="delete-response-btn"
                                 onClick={() =>
-                                  handleDeleteResponse(interview._id, response.candidate._id)
+                                  handleDeleteResponse(
+                                    interview._id,
+                                    response.candidate._id
+                                  )
                                 }
                               >
                                 Delete Response
                               </button>
                               <br />
+                              <Link
+                                to={`/recruiter/candidate-details/${interview._id}/${candidate._id}`}
+                                className="view-details-link"
+                              >
+                                View Details
+                              </Link>
                             </>
+                          ) : (
+                            <em>—</em>
                           )}
-                          <Link
-                            to={`/recruiter/candidate-details/${interview._id}/${candidate._id}`}
-                            className="view-details-link"
-                          >
-                            View Details
-                          </Link>
                         </td>
                       </tr>
                     );
@@ -160,6 +199,7 @@ const RecruiterInterviewResults = () => {
           </div>
         ))
       )}
+
       <div className="back-btn-container">
         <button onClick={() => navigate("/recruiter")} className="back-btn">
           ← Back to Dashboard

@@ -324,44 +324,6 @@ router.get("/interview-results", async (req, res) => {
 });
 
 
-// // ✅ View candidate profile + response details
-// router.get("/candidate-details/:interviewId/:candidateId", async (req, res) => {
-//   const { interviewId, candidateId } = req.params;
-
-//   try {
-//     const interview = await Interview.findById(interviewId)
-//       .populate("responses.candidate", "name email")
-//       .populate("candidates", "_id"); // we will fetch full candidate info separately
-
-//     if (!interview) return res.status(404).json({ message: "Interview not found" });
-
-//     const response = interview.responses.find(
-//       (r) => r.candidate?._id.toString() === candidateId
-//     );
-
-//     // ✅ Find candidate document from Candidate model
-//     const candidateProfile = await Candidate.findOne({ userId: candidateId }).lean();
-//     const userProfile = await User.findById(candidateId).lean();
-
-//     if (!candidateProfile || !userProfile) {
-//       return res.status(404).json({ message: "Candidate not found" });
-//     }
-
-//     const fullCandidate = {
-//       ...userProfile,
-//       ...candidateProfile
-//     };
-
-//     res.json({
-//       candidate: fullCandidate,
-//       response: response || null,
-//     });
-//   } catch (error) {
-//     console.error("❌ Error fetching candidate details:", error.message);
-//     res.status(500).json({ message: "Error fetching candidate details" });
-//   }
-// });
-
 
 // ✅ Delete candidate response for an interview
 router.post("/interview/:interviewId/delete-response", async (req, res) => {
@@ -379,33 +341,55 @@ router.post("/interview/:interviewId/delete-response", async (req, res) => {
   }
 });
 
+
 // GET /recruiter/candidate-details/:interviewId/:candidateId
-router.get("/candidate-details/:interviewId/:candidateId",
+router.get(
+  "/candidate-details/:interviewId/:candidateId",
   async (req, res) => {
     try {
       const { interviewId, candidateId } = req.params;
-      // load the interview and populate the candidate sub‐docs
+
+      // 1. Load the interview, populate responses.candidate => User
       const interview = await Interview.findById(interviewId)
-        .populate("responses.candidate", "name email contactNumber roleApplied introduction skills education");
+        .populate("responses.candidate", "name email");
       if (!interview) {
         return res.status(404).json({ message: "Interview not found" });
       }
-      // find the one response for this candidate
+
+      // 2. Find the one response for this candidate
       const resp = interview.responses.find(
         (r) => r.candidate._id.toString() === candidateId
       );
       if (!resp) {
-        return res.status(404).json({ message: "No response from this candidate" });
+        return res
+          .status(404)
+          .json({ message: "No response from this candidate" });
       }
-      // send back both candidate profile and their response
+
+      // 3. Fetch the Candidate profile by userId
+      const profile = await Candidate.findOne({ userId: resp.candidate._id }).lean();
+
+      // 4. Merge User + Candidate into one flat object
+      const mergedCandidate = {
+        _id:           resp.candidate._id,
+        name:          resp.candidate.name,
+        email:         resp.candidate.email,
+        contactNumber: profile?.contactNumber,
+        roleApplied:   profile?.roleApplied,
+        introduction:  profile?.introduction,
+        skills:        profile?.skills || [],
+        education:     profile?.education || [],
+      };
+
+      // 5. Return everything needed by React
       res.json({
-        candidate: resp.candidate,
+        candidate: mergedCandidate,
         response: {
-          answers:       resp.answers,
-          status:        resp.status,
+          answers:        resp.answers,
+          status:         resp.status,
           submitDateTime: resp.submitDateTime,
-          marks:         resp.marks,
-          analysis:      resp.analysis,      // your JSON from AI
+          marks:          resp.marks,
+          analysis:       resp.analysis,
         },
       });
     } catch (err) {

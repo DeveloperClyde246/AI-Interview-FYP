@@ -68,7 +68,7 @@ const CreateInterview = () => {
       await axios.post("http://localhost:5000/recruiter/create-interview", form, {
         withCredentials: true,
       });
-      navigate("/recruiter/interviews");
+      navigate("/recruiter");
     } catch (err) {
       if (err.response && err.response.status === 400) {
         setError(err.response.data.message);
