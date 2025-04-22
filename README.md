@@ -11,4 +11,5 @@ npm run devStart
 
 ### Open another terminal
 cd client
+
 npm run dev
