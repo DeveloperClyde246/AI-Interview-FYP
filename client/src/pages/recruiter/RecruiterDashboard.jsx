@@ -84,13 +84,13 @@ const RecruiterDashboard = () => {
                 <th>Title</th>
                 <th>Candidate</th>
                 <th>Scheduled Date</th>
-                <th>Status</th>
+                {/* <th>Status</th> */}
               </tr>
             </thead>
             <tbody>
               {interviews.length === 0 ? (
                 <tr>
-                  <td colSpan="4">No scheduled interviews</td>
+                  <td colSpan="3">No scheduled interviews</td>
                 </tr>
               ) : (
                 interviews.map((interview) => (
@@ -112,7 +112,7 @@ const RecruiterDashboard = () => {
                         ? new Date(interview.scheduled_date).toLocaleString()
                         : "Not Scheduled"}
                     </td>
-                    <td>{interview.status || "Pending"}</td>
+                    {/* <td>{interview.status || "Pending"}</td> */}
                   </tr>
                 ))
               )}

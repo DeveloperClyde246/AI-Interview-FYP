@@ -129,8 +129,8 @@ html, body {
 
   /* Wrap each analysis section in a card */
 .analysis-section {
-  background-color: #fafafa;
-  border: 1px solid #e0e0e0;
+  background-color: #e7e7e7;
+  border: 1px solid #b0b0b0;
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 2rem;

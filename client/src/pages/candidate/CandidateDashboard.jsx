@@ -66,7 +66,7 @@ const CandidateDashboard = () => {
               notifications.map((notification) => (
                 <li key={notification._id}>
                   <Link to={`notifications/${notification._id}`}>
-                    {notification.message} -{" "}
+                    {notification.message} ------ {" "}
                     {new Date(notification.createdAt).toLocaleString()}
                   </Link>{" "}
                   ({notification.status === "unread" ? "🔔" : "✅"})
@@ -84,13 +84,13 @@ const CandidateDashboard = () => {
                 <th>Title</th>
                 <th>Recruiter</th>
                 <th>Scheduled Date</th>
-                <th>Status</th>
+                {/* <th>Status</th> */}
               </tr>
             </thead>
             <tbody>
               {interviews.length === 0 ? (
                 <tr>
-                  <td colSpan="4">No scheduled interviews</td>
+                  <td colSpan="3">No scheduled interviews</td>
                 </tr>
               ) : (
                 interviews.map((interview) => (
@@ -103,7 +103,7 @@ const CandidateDashboard = () => {
                     <td>
                       {new Date(interview.scheduled_date).toLocaleString()}
                     </td>
-                    <td>{interview.status || "Pending"}</td>
+                    {/* <td>{interview.status || "Pending"}</td> */}
                   </tr>
                 ))
               )}

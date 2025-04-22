@@ -119,7 +119,7 @@ export default function RecruiterCandidateDetails() {
                     ))}
                     <p><strong>Most Likely:</strong> {a.most_likely_emotion}</p>
                     <p><strong>Fluency Level:</strong> {a.fluent_level}</p>
-                    <p><strong>Score:</strong> {a.interview_score_tab1.toFixed(2)} / 10</p>
+                    <p><strong>Score:</strong> {a.interview_score_tab1.toFixed(2)} / 10.00</p>
                   </div>
 
                   {/* Sub‑tab 2: Personality */}
@@ -147,7 +147,7 @@ export default function RecruiterCandidateDetails() {
                       }]}
                       layout={{ width:350, height:250, title:"Traits (%)" }}
                     />
-                    <p><strong>Score:</strong> {a.interview_score_tab2.toFixed(2)} / 10</p>
+                    <p><strong>Score:</strong> {a.interview_score_tab2.toFixed(2)} / 10.00</p>
                   </div>
 
                   {/* Sub‑tab 3: Text‑Based */}
@@ -157,7 +157,7 @@ export default function RecruiterCandidateDetails() {
                     <p><strong>Transcript:</strong> {a.transcript}</p>
                     <p><strong>Stress:</strong> {a.stress_detected ? "Yes" : "No"}</p>
                     <p><strong>Emotion:</strong> {a.text_emotion}</p>
-                    <p><strong>Score:</strong> {a.interview_score_tab3.toFixed(2)} / 10</p>
+                    <p><strong>Score:</strong> {a.interview_score_tab3.toFixed(2)} / 10.00</p>
                   </div>
 
                   {/* Sub‑tab 4: Facial + Gaze */}
@@ -190,7 +190,7 @@ export default function RecruiterCandidateDetails() {
                       </tbody>
                     </table>
                     <p><strong>Predominant:</strong> {a.max_emotion}</p>
-                    <p><strong>Facial Score:</strong> {a.average_emotion_score.toFixed(2)} / 10</p>
+                    <p><strong>Facial Score:</strong> {a.average_emotion_score.toFixed(2)} / 10.00</p>
 
                     <Plot
                       data={[{
@@ -218,8 +218,8 @@ export default function RecruiterCandidateDetails() {
                       </tbody>
                     </table>
                     <p><strong>Predominant:</strong> {a.max_eye_gaze}</p>
-                    <p><strong>Gaze Score:</strong> {a.final_eye_gaze_score.toFixed(2)} / 10</p>
-                    <p><strong>Combined:</strong> {a.interview_score_tab4.toFixed(2)} / 10</p>
+                    <p><strong>Gaze Score:</strong> {a.final_eye_gaze_score.toFixed(2)} / 10.00</p>
+                    <p><strong>Combined:</strong> {a.interview_score_tab4.toFixed(2)} / 10.00</p>
                   </div>
                 </>
               )}
@@ -233,7 +233,7 @@ export default function RecruiterCandidateDetails() {
           <div className="final-score-box">
             {response.marks != null
               ? response.marks.toFixed(2)
-              : "N/A"} / 10
+              : "N/A"} / 10.00
           </div>
         </section>
 

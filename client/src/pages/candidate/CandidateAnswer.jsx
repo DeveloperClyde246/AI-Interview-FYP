@@ -214,13 +214,16 @@ const CandidateAnswer = () => {
       }
     });
   
-    alert("Please wait for analysis to complete. It may take a few minutes. Will prompt after completion.");
+    
     try {
+      alert("Please wait for analysis to complete. It may take a few minutes. Will prompt after completion.");
+      
       const res = await axios.post(
         `http://localhost:5000/candidate/interview/${id}/submit`,
         formData,
         { withCredentials: true }
       );
+      
   
       if (res.status === 200) {
         // ← read `marks` instead of `avgMark`
@@ -229,7 +232,7 @@ const CandidateAnswer = () => {
       }
     } catch (err) {
       if (err.response && err.response.status === 400) {
-        alert(err.response.data.message || "Please wait analysis to complete");
+        alert(err.response.data.message || "Please wait for analysis to complete");
       } else {
         console.error("❌ Error submitting answers:", err);
         alert("Error submitting answers. Please try again.");
