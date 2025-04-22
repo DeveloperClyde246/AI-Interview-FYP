@@ -1,0 +1,102 @@
+/* Container styling */
+.container {
+    padding: 2rem;
+    min-height: 100vh;
+    background: #f4f7f9;
+    font-family: Arial, sans-serif;
+  }
+  
+  .container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+  
+  .error {
+    text-align: center;
+    color: red;
+    margin-bottom: 1rem;
+  }
+  
+  /* Grid layout: three cards per row */
+  .interview-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  /* Individual interview card styling */
+  .interview-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .interview-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .interview-card h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.2rem;
+  }
+  
+  .interview-card p {
+    margin: 0.5rem 0;
+    color: #555;
+    font-size: 0.95rem;
+  }
+  
+  /* Actions styling within the card */
+  .card-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .delete-btn {
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .delete-btn:hover {
+    background-color: #c0392b;
+  }
+  
+  /* Create new interview link styling */
+  .create-link {
+    display: block;
+    text-align: center;
+    margin-top: 2rem;
+    text-decoration: none;
+    color: #007bff;
+    font-size: 1rem;
+  }
+  
+
+  .create-btn {
+    display: inline-block;
+    padding: 0.8rem 1rem;
+    background-color: #38bdf8;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+  }
+  
+  .create-btn:hover {
+    background-color: #2a9bd4;
+  }

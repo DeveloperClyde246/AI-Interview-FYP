@@ -3,191 +3,218 @@ const authMiddleware = require("../middleware/authMiddleware");
 const Interview = require("../models/Interview");
 const Notification = require("../models/Notification");
 const mongoose = require("mongoose");
-
 const User = require("../models/User");
-const path = require("path");
-
 const bcrypt = require("bcryptjs");
-
-const router = express.Router();
 const multer = require("multer");
 const cloudinary = require("../config/cloudinary");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const axios = require("axios");
+const Candidate = require("../models/candidate");
+
+const router = express.Router();
+
+//convert to mp4
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+ffmpeg.setFfmpegPath(ffmpegPath);
+const FormData = require("form-data");
+const fs = require('fs');
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 
 
-// Ensure only candidates can access this page
+// Ensure only candidates can access these routes
 router.use(authMiddleware(["candidate"]));
 
-// ✅ Candidate Main Page
+//---------------dashbooard page------------------//
+// ✅ Candidate Dashboard - Get notifications and interviews
 router.get("/", async (req, res) => {
   try {
     const candidateId = new mongoose.Types.ObjectId(req.user.id);
 
     // Fetch notifications for the candidate
-    const notifications = await Notification.find({ userId: candidateId }).sort({ createdAt: -1 });
+    const notifications = await Notification.find({ userId: candidateId }).sort({
+      createdAt: -1,
+    });
 
     // Fetch interviews where the candidate is assigned
     const interviews = await Interview.find({ candidates: candidateId })
       .populate("recruiterId", "name email")
       .sort({ scheduled_date: -1 });
 
-    res.render("candidate-dashboard", {
-      title: "Candidate Dashboard",
-      username: req.cookies.username,
-      notifications,
-      interviews
-    });
+    res.json({ username: req.cookies.username, notifications, interviews });
   } catch (error) {
     console.error("❌ Error loading candidate dashboard:", error.message);
     res.status(500).json({ message: "Error loading dashboard" });
   }
 });
 
-
-//Notifications------------------------------------
-// ✅ View Notification Details
+// ✅ Get Notification Details
 router.get("/notifications/:id", async (req, res) => {
-    try {
-      const notification = await Notification.findById(req.params.id);
-      if (!notification) return res.status(404).send("Notification not found");
-  
-      res.render("candidate-notification-details", { title: "Notification Details", notification });
-    } catch (error) {
-      console.error("❌ Error fetching notification details:", error.message);
-      res.status(500).json({ message: "Error fetching notification details" });
+  try {
+    const notification = await Notification.findById(req.params.id);
+    if (!notification) return res.status(404).json({ message: "Notification not found" });
+
+    res.json({ notification });
+  } catch (error) {
+    console.error("❌ Error fetching notification details:", error.message);
+    res.status(500).json({ message: "Error fetching notification details" });
+  }
+});
+
+// Delete Notification
+router.delete("/notifications/:id/delete", async (req, res) => {
+  const notification = await Notification.findById(req.params.id);
+  if (!notification) return res.status(404).json({ message:"Notification not found" });
+
+  if (notification.interviewDate) {
+    const diff = new Date(notification.interviewDate) - new Date();
+    if (diff > 0 && diff <= 24*60*60*1000) {
+      return res.status(403).json({
+        message:
+          "You cannot delete this notification because the interview is happening within 24 hours.",
+      });
     }
-  });
-  
-// ✅ Delete Notification
-router.post("/notifications/:id/delete", async (req, res) => {
-try {
-    await Notification.findByIdAndDelete(req.params.id);
-    res.redirect("/candidate");
-} catch (error) {
-    console.error("❌ Error deleting notification:", error.message);
-    res.status(500).json({ message: "Error deleting notification" });
-}
+  }
+
+  await Notification.findByIdAndDelete(req.params.id);
+  res.json({ message: "Notification deleted successfully" });
 });
 
 
 
-//Profile------------------------------------
-// // ✅ Set Up Multer for Resume Upload
-// const storage = multer.diskStorage({
-//     destination: (req, file, cb) => {
-//       cb(null, "uploads/resumes/"); // ✅ Save resumes in "uploads/resumes/"
-//     },
-//     filename: (req, file, cb) => {
-//       cb(null, req.user.id + path.extname(file.originalname)); // ✅ Use candidate ID as filename
-//     }
-//   });
-//   const upload = multer({ storage });
-  
-// ✅ Render Candidate Profile Page
+//---------------profile pages------------------//
+// ✅ Get Candidate Profile
 router.get("/profile", async (req, res) => {
-    try {
-      const candidate = await User.findById(req.user.id);
-      res.render("candidate-profile", { title: "Edit Profile", candidate });
-    } catch (error) {
-      console.error("❌ Error loading profile:", error.message);
-      res.status(500).json({ message: "Error loading profile" });
-    }
-  });
-  
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    const candidateProfile = await Candidate.findOne({ userId: req.user.id });
 
-  // ✅ Handle Password Update
+    res.json({
+      candidate: {
+        ...user.toObject(),
+        ...candidateProfile?.toObject(),
+      },
+    });
+  } catch (error) {
+    console.error("❌ Error loading profile:", error.message);
+    res.status(500).json({ message: "Error loading profile" });
+  }
+});
+
+// ✅ Update Profile
+router.post("/profile/edit", async (req, res) => {
+  const {
+    name,
+    email,
+    roleApplied,
+    skills,
+    introduction,
+    education,
+    contactNumber,
+  } = req.body;
+
+  try {
+    await User.findByIdAndUpdate(req.user.id, { name, email });
+
+    let candidate = await Candidate.findOne({ userId: req.user.id });
+    if (!candidate) {
+      candidate = new Candidate({ userId: req.user.id });
+    }
+
+    candidate.roleApplied = roleApplied;
+    candidate.skills = skills;
+    candidate.introduction = introduction;
+    candidate.education = education;
+    candidate.contactNumber = contactNumber;
+
+    await candidate.save();
+
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    console.error("❌ Error updating profile:", error.message);
+    res.status(500).json({ message: "Error updating profile" });
+  }
+});
+
+
+// ✅ Update Candidate Password
 router.post("/profile/edit-password", async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 
   try {
     const candidate = await User.findById(req.user.id);
 
-    // ✅ Check if current password is correct
+    // Check if current password is correct
     const isMatch = await bcrypt.compare(currentPassword, candidate.password);
     if (!isMatch) {
-      return res.render("candidate-profile", { title: "Edit Profile", candidate, errorMessage: "Incorrect current password." });
+      return res.status(400).json({ message: "Incorrect current password" });
     }
 
-    // ✅ Hash new password and update
+    // Hash new password and update
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await User.findByIdAndUpdate(req.user.id, { password: hashedPassword });
 
-    res.redirect("/candidate/profile");
+    res.json({ message: "Password updated successfully" });
   } catch (error) {
     console.error("❌ Error updating password:", error.message);
     res.status(500).json({ message: "Error updating password" });
   }
 });
-  // // ✅ Handle Resume Upload & Replace Existing One
-  // router.post("/profile/upload-resume", upload.single("resume"), async (req, res) => {
-  //   try {
-  //     const candidate = await User.findById(req.user.id);
-  
-  //     // If an old resume exists, delete it
-  //     if (candidate.resume) {
-  //       const oldResumePath = path.join(__dirname, "..", candidate.resume);
-  //       if (fs.existsSync(oldResumePath)) {
-  //         fs.unlinkSync(oldResumePath);
-  //       }
-  //     }
-  
-  //     // Save new resume path
-  //     await User.findByIdAndUpdate(req.user.id, { resume: `/uploads/resumes/${req.file.filename}` });
-  //     res.redirect("/candidate/profile");
-  //   } catch (error) {
-  //     console.error("❌ Error uploading resume:", error.message);
-  //     res.status(500).json({ message: "Error uploading resume" });
-  //   }
-  // });
-  
-  // // ✅ Handle Resume Deletion
-  // router.post("/profile/delete-resume", async (req, res) => {
-  //   try {
-  //     const candidate = await User.findById(req.user.id);
-  
-  //     if (candidate.resume) {
-  //       const resumePath = path.join(__dirname, "..", candidate.resume);
-  //       if (fs.existsSync(resumePath)) {
-  //         fs.unlinkSync(resumePath); // ✅ Delete file from server
-  //       }
-  
-  //       await User.findByIdAndUpdate(req.user.id, { resume: null }); // ✅ Remove from DB
-  //     }
-  
-  //     res.redirect("/candidate/profile");
-  //   } catch (error) {
-  //     console.error("❌ Error deleting resume:", error.message);
-  //     res.status(500).json({ message: "Error deleting resume" });
-  //   }
-  // });
 
 
-//Interviews------------------------------------
-// ✅ View Assigned Interviews
 
+//---------------answer pages------------------//
+// ✅ Get Assigned Interviews
 router.get("/interviews", async (req, res) => {
   try {
     const candidateId = new mongoose.Types.ObjectId(req.user.id);
-    
+
     const interviews = await Interview.find({ candidates: candidateId })
       .populate("recruiterId", "name email")
       .sort({ scheduled_date: -1 });
 
-    res.render("candidate-interviews", { title: "My Interviews", interviews });
+    const interviewsWithStatus = interviews.map((interview) => {
+      const response = interview.responses.find(
+        (res) => res.candidate.toString() === candidateId.toString()
+      );
+    
+      return {
+        ...interview.toObject(),
+        alreadySubmitted: !!response,
+        status: response ? response.status : "pending"
+      };
+    });
+
+    res.json({ interviews: interviewsWithStatus });
   } catch (error) {
     console.error("❌ Error fetching interviews:", error.message);
     res.status(500).json({ message: "Error fetching interviews" });
   }
 });
 
-// ✅ View Interview Questions & Answer Form
+
+// ✅ Get Interview Details and Status
 router.get("/interview/:id", async (req, res) => {
   try {
-    const interview = await Interview.findById(req.params.id);
-    if (!interview) return res.status(404).send("Interview not found");
+    const candidateId = req.user.id;
 
-    res.render("candidate-answer", { title: "Answer Questions", interview });
+    // ✅ Populate recruiter details
+    const interview = await Interview.findById(req.params.id).populate("recruiterId", "name email");
+
+    if (!interview) {
+      return res.status(404).json({ message: "Interview not found" });
+    }
+
+    // ✅ Find candidate response (if any)
+    const response = interview.responses.find(
+      (res) => res.candidate.toString() === candidateId
+    );
+
+    const status = response?.status || "pending";
+    const submitDateTime = response?.submitDateTime || null;
+
+    res.json({ interview, status, submitDateTime }); // ✅ Include submitDateTime
   } catch (error) {
     console.error("❌ Error fetching interview:", error.message);
     res.status(500).json({ message: "Error fetching interview" });
@@ -196,7 +223,43 @@ router.get("/interview/:id", async (req, res) => {
 
 
 
-// ✅ Multer Storage for File Uploads (Manual Uploads)
+// ✅ Get Interview Results
+router.get("/interview/:id/results", async (req, res) => {
+  try {
+    const candidateId = req.user.id;
+    const interview = await Interview.findById(req.params.id)
+      .populate("recruiterId", "name email");
+
+    if (!interview) {
+      return res.status(404).json({ message: "Interview not found" });
+    }
+
+    const response = interview.responses.find(
+      (res) => res.candidate.toString() === candidateId
+    );
+
+    if (!response) {
+      return res.status(404).json({ message: "You have not submitted this interview." });
+    }
+
+    res.json({
+      title: interview.title,
+      recruiter: interview.recruiterId,
+      questions: interview.questions,
+      answers: response.answers,
+      videoMarks: response.videoMarks,
+      averageMark: response.marks,
+      submitDateTime: response.submitDateTime,
+      status: response.status,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching result:", err.message);
+    res.status(500).json({ message: "Error fetching result" });
+  }
+});
+
+
+// ✅ Submit Interview Answers setup
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -208,102 +271,143 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 200 * 1024 * 1024 }, // ✅ Allow up to 200MB file uploads
+  limits: { fileSize: 200 * 1024 * 1024 }, // Allow up to 200MB file uploads
 });
 
-router.post("/interview/:id/submit", upload.array("fileAnswers", 5), async (req, res) => {
-  try {
-    const candidateId = req.user.id;
-    let processedAnswers = [];
-    let videoURL = "";
+// ✅ Submit Interview Answers
+router.post("/interview/:id/submit",
+  upload.array("fileAnswers", 5),
+  async (req, res) => {
+    try {
+      const candidateId = req.user.id;
+      const interview   = await Interview.findById(req.params.id);
+      if (!interview) return res.status(404).json({ message: "Interview not found" });
 
-    // ✅ Check if the candidate has already submitted a response
-    const interview = await Interview.findById(req.params.id);
-    if (!interview) {
-      return res.status(404).json({ message: "Interview not found" });
-    }
-
-    const existingResponse = interview.responses.find(
-      (response) => response.candidate.toString() === candidateId
-    );
-
-    if (existingResponse) {
-      return res.status(400).json({ message: "You have already submitted answers for this interview." });
-    }
-
-    // ✅ Debugging: Log received data
-    console.log("📩 Received Answers:", req.body.answers);
-    console.log("📁 Received Files:", req.files);
-
-    // ✅ Process File Uploads
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        console.log("⬆ Uploading file to Cloudinary:", file.originalname);
-        const uploadResponse = await cloudinary.uploader.upload(file.path, {
-          resource_type: "auto",
-          folder: "interview_responses"
-        });
-        console.log("✅ File Uploaded:", uploadResponse.secure_url);
-        processedAnswers.push(uploadResponse.secure_url);
+      // prevent double submit
+      if (interview.responses.some(r => r.candidate.toString() === candidateId)) {
+        return res.status(400).json({ message: "Please wait analysis to finish." });
       }
-    }
 
-    // ✅ Process Cloudinary Video URL (Ensure It’s Not Added Multiple Times)
-    if (req.body.answers) {
-      for (const answer of req.body.answers) {
-        if (answer.startsWith("http") && answer.includes("video/upload")) {
-          if (!videoURL) {  // ✅ Store video URL only once
-            videoURL = answer;
-            processedAnswers.push(answer);
-          }
-        } else {
-          processedAnswers.push(answer);
+      // collect answers + video URLs
+      const processedAnswers = [];
+      const videoURLs        = [];
+
+      for (let f of req.files || []) {
+        processedAnswers.push(f.path);
+      }
+      for (let ans of req.body.answers || []) {
+        processedAnswers.push(ans);
+        if (ans.startsWith("http") && ans.includes("/upload/")) {
+          // transform to mp4 URL on Cloudinary
+          const mp4 = ans
+            .replace("/upload/", "/upload/f_mp4/")
+            .replace(/\.webm$/, ".mp4");
+          videoURLs.push(mp4);
         }
       }
-    }
 
-    // ✅ Store Responses in Database
-    const newResponse = { candidate: candidateId, answers: processedAnswers, marks: null };
-    interview.responses.push(newResponse);
-    await interview.save();
-    console.log("✅ Responses saved to database:", newResponse);
+      // create a new sub‑document
+      const submittedAt = new Date();
+      const isLate      = submittedAt > interview.scheduled_date;
+      interview.responses.push({
+        candidate:      candidateId,
+        answers:        processedAnswers,
+        analysis:       [],          // ← AI results will go here
+        marks:          null,
+        status:         isLate ? "submitted late" : "submitted",
+        submitDateTime: submittedAt
+      });
+      await interview.save();
 
-    // ✅ Send Video to AI Analysis (if a video response exists)
-    if (videoURL) {
-      console.log("📡 Sending video to AI for analysis:", videoURL);
-      const aiResponse = await axios.post("http://localhost:5001/analyze-video", { videoURL });
-      console.log("🤖 AI Response:", aiResponse.data);
+      // prepare temp dir
+      const tmpDir = path.join(__dirname, "../temp");
+      fs.mkdirSync(tmpDir, { recursive: true });
 
-      const { marks } = aiResponse.data; // ✅ AI returns marks
+      const analyses = [];
 
-      // ✅ Find and update the response in the database
-      const updatedInterview = await Interview.findOneAndUpdate(
-        { _id: req.params.id, "responses.candidate": candidateId }, // Find correct interview and response
-        { $set: { "responses.$.marks": marks } }, // Update only the marks field
-        { new: true } // Return updated document
-      );
+      // for each video URL run AI analysis
+      for (let url of videoURLs) {
+        try {
+          // detect extension
+          const { pathname } = new URL(url);
+          const ext = path.extname(pathname) || ".mp4";
+          const downloadPath = path.join(tmpDir, `${uuidv4()}${ext}`);
 
-      if (updatedInterview) {
-        console.log("✅ Marks updated successfully in database:", marks);
-        console.log("📂 Updated Interview Document:", JSON.stringify(updatedInterview, null, 2));
-      } else {
-        console.error("❌ Failed to update marks.");
+          // download
+          const writer = fs.createWriteStream(downloadPath);
+          const resp   = await axios.get(url, { responseType: "stream" });
+          await new Promise((ok, no) => {
+            resp.data.pipe(writer);
+            writer.on("finish", ok);
+            writer.on("error",  no);
+          });
+
+          // convert if not already mp4
+          let mp4Path = downloadPath;
+          if (ext.toLowerCase() !== ".mp4") {
+            mp4Path = downloadPath.replace(ext, ".mp4");
+            await new Promise((ok, no) => {
+              ffmpeg(downloadPath)
+                .output(mp4Path)
+                .on("end", ok)
+                .on("error", no)
+                .run();
+            });
+          }
+
+          // call your Flask AI endpoint
+          const form = new FormData();
+          form.append("file", fs.createReadStream(mp4Path));
+          const aiRes = await axios.post(
+            "http://localhost:5001/analyze",
+            form,
+            { headers: form.getHeaders(), timeout: 180_000 }
+          );
+
+          analyses.push(aiRes.data);
+
+          // cleanup
+          fs.unlinkSync(downloadPath);
+          if (mp4Path !== downloadPath) fs.unlinkSync(mp4Path);
+        }
+        catch (err) {
+          console.error("AI analysis failed for", url, err.message);
+          analyses.push({ error: err.message });
+        }
       }
+
+      // write analyses back into the same sub‑doc and compute marks
+      const resp = interview.responses.find(r => r.candidate.toString() === candidateId);
+      resp.analysis = analyses;
+
+      // average of analysis[].final_average_score, defaulting missing → 0
+      const scores = analyses.map(a =>
+        typeof a.final_average_score === "number" ? a.final_average_score : 0
+      );
+      if (scores.length) {
+        const avgRaw = scores.reduce((sum, v) => sum + v, 0) / scores.length;
+        // keep two decimals
+        resp.marks = Number(avgRaw.toFixed(2));
+      } else {
+        resp.marks = null;
+      }
+
+      await interview.save();
+
+      return res.json({ message: "Submitted & analyzed", marks: resp.marks, analyses });
     }
-
-    res.redirect("/candidate/interviews");
-  } catch (error) {
-    console.error("❌ Error submitting answers:", error.message);
-    res.status(500).json({ message: "Error submitting answers" });
+    catch (err) {
+      console.error("❌ submit error:", err);
+      return res.status(500).json({ message: "Server error", error: err.message });
+    }
   }
-});
+);
 
 
-
-//FAQ------------------------------------
+//---------------faq pages------------------//
+// ✅ Get FAQ Details
 router.get("/faq", (req, res) => {
-  res.render("candidate-faq", { title: "FAQ" });
+  res.json({ message: "FAQ Page Loaded" });
 });
-  
 
 module.exports = router;

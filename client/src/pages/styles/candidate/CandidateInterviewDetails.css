@@ -1,0 +1,97 @@
+/* Basic resets and typography */
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Container with soft background */
+  .container {
+    background: #f4f7f9;
+    min-height: 100vh;
+    padding: 2rem;
+    min-width: 700px;
+  }
+  
+  /* Centered card for interview details */
+  .details-card {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .details-card h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Grouping details */
+  .detail-group p {
+    margin: 0.5rem 0;
+    color: #555;
+  }
+  
+  /* Notice for single submission */
+  .notice {
+    text-align: center;
+    margin: 1rem 0;
+    font-style: italic;
+    color: #777;
+  }
+  
+  /* Action button styling */
+  .action-btn {
+    display: block;
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #38bdf8;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 1rem 0;
+    transition: background-color 0.2s ease;
+  }
+  
+  .action-btn:hover {
+    background-color: #2a9bd4;
+  }
+  
+  /* Submitted message styling */
+  .submitted-text {
+    text-align: center;
+    color: green;
+    font-weight: bold;
+    margin: 1rem 0;
+  }
+  
+  /* Back button styling */
+  .back-btn {
+    display: block;
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #555;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .back-btn:hover {
+    background-color: #333;
+  }
+  
+  /* Loading state styling */
+  .loading {
+    text-align: center;
+    margin-top: 2rem;
+    color: #333;
+  }
+  

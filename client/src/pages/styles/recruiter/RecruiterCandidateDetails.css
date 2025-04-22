@@ -1,0 +1,214 @@
+/* Base reset and typography */
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Container with a soft background */
+  .candidate-details-container {
+    background: #f4f7f9;
+    min-height: 100vh;
+    padding: 2rem;
+    min-width: 700px;
+    color: #333;
+  }
+  
+  /* Centered card for candidate details */
+  .candidate-details-card {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    text-align: left;
+  }
+  
+  /* Main heading styling */
+  .candidate-details-card h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+
+  h3{
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+
+  .candidate-details-container h3 {
+    background-color: #333;    /* dark grey */
+    color: #fff;               /* white text */
+    padding: 0.5rem 1rem;      /* some breathing room */
+    border-radius: 4px;        /* optional rounding */
+    margin-bottom: 1rem;       /* space below */
+  }
+  
+  /* Candidate info styling */
+  .candidate-info p {
+    margin: 0.5rem 0;
+    color: #555;
+  }
+  
+  /* Section styling for skills, education, answers, etc. */
+  .section {
+    margin-top: 1.5rem;
+  }
+  
+  .section h3 {
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  
+  /* List styling */
+  .list {
+    list-style: disc;
+    padding-left: 1.5rem;
+    color: #555;
+  }
+  
+  .answers-list {
+    list-style: decimal;
+    padding-left: 1.5rem;
+    color: #555;
+  }
+
+  .view-file-btn {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Average mark styling */
+  .average-mark {
+    margin-top: 0.5rem;
+    color: #333;
+  }
+  
+  /* No response message styling */
+  .no-response {
+    text-align: center;
+    color: #777;
+    margin-top: 1.5rem;
+  }
+  
+  /* Back button styling */
+  .back-btn-container {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .back-btn {
+    display: inline-block;
+    padding: 0.8rem 1.2rem;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+  }
+  
+  .back-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Loading and error styling */
+  .loading, .error {
+    text-align: center;
+    margin-top: 2rem;
+    color: #333;
+  }
+
+  .view-file-btn {
+    margin-right: 0.5rem; /* or whatever spacing you like */
+  }
+  
+
+  /* Wrap each analysis section in a card */
+.analysis-section {
+  background-color: #e7e7e7;
+  border: 1px solid #b0b0b0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+
+.analysis-section h4 {
+  background-color: #010a46;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+/* Space out the sub‐sections */
+.analysis-section .section {
+  margin-bottom: 1.5rem;
+}
+
+/* Dark h3 headers inside analysis */
+.analysis-section h3 {
+  background-color: #333;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+/* Tidy up answer list items */
+.answers-list li {
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Style the “View” buttons */
+.view-btn {
+  background-color: #007ACC;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Add a little space between multiple buttons */
+.view-btn + .view-btn {
+  margin-left: 0.5rem;
+}
+
+/* Optional: wrap buttons in a flex container for even spacing */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* analysis tables get a light border and padding */
+.analysis-section .simple-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  border: 1px solid #888;
+}
+
+.analysis-section .simple-table th,
+.analysis-section .simple-table td {
+  border: 1px solid #888;
+  padding: 0.5rem;
+}
+
+.analysis-section .simple-table th {
+  background-color: #f0f0f0;
+}
+

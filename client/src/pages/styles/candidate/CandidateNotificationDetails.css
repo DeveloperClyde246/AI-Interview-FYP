@@ -1,0 +1,82 @@
+/* Container with soft background */
+.container {
+    background: #f4f7f9;
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Centered card for notification details */
+  .notification-card {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  /* Header styling */
+  .notification-card h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Grouped details styling */
+  .detail-group p {
+    margin: 0.5rem 0;
+    color: #555;
+  }
+  
+  /* Actions container */
+  .actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+  
+  /* Delete button styling */
+  .delete-btn {
+    padding: 0.8rem 1rem;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .delete-btn:hover:enabled {
+    background-color: #c0392b;
+  }
+  
+  .delete-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Back link styling */
+  .back-link {
+    display: block;
+    text-align: center;
+    margin-top: 1.5rem;
+    text-decoration: none;
+    color: #007bff;
+    font-size: 1rem;
+  }
+  
+  /* Error and Loading state styling */
+  .error {
+    text-align: center;
+    color: red;
+    margin-top: 2rem;
+  }
+  
+  .loading {
+    text-align: center;
+    margin-top: 2rem;
+    color: #333;
+  }
+  
