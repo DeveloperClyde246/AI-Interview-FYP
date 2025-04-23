@@ -1,6 +1,6 @@
 # AI-Interview-FYP-Fullstack
 
-## to setup:
+## Setup:
 ```
 git clone https://github.com/DeveloperClyde246/AI-Interview-FYP-Backend.git
 
@@ -23,4 +23,10 @@ Open another terminal
 ```
 cd client
 npm run dev
+```
+
+### Start Analysis API
+File > New Window > Open new folder > run command below
+```
+git clone https://github.com/DeveloperClyde246/Interview-AI-API.git
 ```
