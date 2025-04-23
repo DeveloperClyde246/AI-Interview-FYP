@@ -13,7 +13,7 @@ const CandidateFAQ = () => {
         <div className="faq-item">
           <h3>1. How do I schedule an interview?</h3>
           <p>
-            Interviews are scheduled by recruiters. You will be informed by the recruiter once an interview is assigned to you.
+            Interviews are scheduled by recruiters. You will be able to view the interviews once an interview is assigned to you.
           </p>
         </div>
         
