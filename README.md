@@ -1,10 +1,21 @@
 # AI-Interview-FYP-Fullstack
 
 ## Setup:
-### Clone code
+### Download Node.js
 ```
-git clone https://github.com/DeveloperClyde246/AI-Interview-FYP-Backend.git
+# Download and install fnm:
+winget install Schniz.fnm
+# Download and install Node.js:
+fnm install 22
+# Verify the Node.js version:
+node -v # Should print "v22.15.0".
+# Verify npm version:
+npm -v # Should print "10.9.2".
+```
 
+### Extract compressed folder into folder under C: drive
+```
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 cd AI-Interview-FYP-Backend
 ```
 ### Install the packages
@@ -23,18 +34,23 @@ Open another terminal
 
 ```
 cd client
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 npm run dev
 ```
+### Navigate to login page
+In any browser, put link http://localhost:5173/login
+mainAdmin -- Email: mainAdmin@gmail.com         Psw:test
+recruiter1 -- Email: recruiter1@gmail.com       Psw:test
+candidate1 -- Email: candidate1@gmail.com       Psw:test
 
-### Start Analysis API
+### Setup Analysis API
 #### Installation
 1. Install ffmpeg, can refer to this video "https://www.youtube.com/watch?v=JR36oH35Fgg"
 2. Install python version 3.10.0
 
-#### Clone and run code
-File > New Window > Open new folder > run command below
+#### Extract compressed folder into folder under C: drive
+Open folder
 ```
-git clone https://github.com/DeveloperClyde246/Interview-AI-API.git
 pip install -r requirements.txt
 python analysis_api.py
 ```
