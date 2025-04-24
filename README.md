@@ -41,11 +41,11 @@ npm run dev
 In any browser, put link http://localhost:5173/login
 
 
-mainAdmin -- Email: mainAdmin@gmail.com         Psw:test
+mainAdmin -- Email: mainAdmin@gmail.com         Psw: test
 
-recruiter1 -- Email: recruiter1@gmail.com       Psw:test
+recruiter1 -- Email: recruiter1@gmail.com       Psw: test
 
-candidate1 -- Email: candidate1@gmail.com       Psw:test
+candidate1 -- Email: candidate1@gmail.com       Psw: test
 
 ### Setup Analysis API
 #### Installation
