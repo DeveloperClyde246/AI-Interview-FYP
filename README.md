@@ -38,7 +38,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 npm run dev
 ```
 ### Navigate to login page
-In any browser, put link http://localhost:5173/login
+In any browser, open link http://localhost:5173/login
 
 
 mainAdmin -- Email: mainAdmin@gmail.com         Psw: test
