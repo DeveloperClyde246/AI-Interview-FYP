@@ -1,6 +1,6 @@
 # AI-Interview-FYP-Fullstack
 
-## Setup:
+## Setup Web App:
 ### Download Node.js
 ```
 # Download and install fnm:
@@ -47,12 +47,12 @@ recruiter1 -- Email: recruiter1@gmail.com       Psw: test
 
 candidate1 -- Email: candidate1@gmail.com       Psw: test
 
-### Setup Analysis API
-#### Installation
+## Setup Analysis API
+### Installation
 1. Install ffmpeg, can refer to this video "https://www.youtube.com/watch?v=JR36oH35Fgg"
 2. Install python version 3.10.0
 
-#### Extract compressed folder into folder under C: drive
+### Extract compressed folder into folder under C: drive
 Open folder
 ```
 pip install -r requirements.txt
