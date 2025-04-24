@@ -14,6 +14,7 @@ npm -v # Should print "10.9.2".
 ```
 
 ### Extract compressed folder into folder under C: drive
+Open folder in Visual Studio Code
 ```
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 cd AI-Interview-FYP-Backend
@@ -53,7 +54,7 @@ candidate1 -- Email: candidate1@gmail.com       Psw: test
 2. Install python version 3.10.0
 
 ### Extract compressed folder into folder under C: drive
-Open folder
+Open folder in Visual Studio Code
 ```
 pip install -r requirements.txt
 python analysis_api.py
