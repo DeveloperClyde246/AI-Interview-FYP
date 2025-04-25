@@ -54,7 +54,7 @@ candidate1 -- Email: candidate1@gmail.com       Psw: test
 ## Setup Analysis API
 ### Installation
 1. Install ffmpeg, can refer to this video "https://www.youtube.com/watch?v=JR36oH35Fgg"
-2. Install python version 3.10.0
+2. Install newest python version
 
 ### Extract compressed folder into folder under C: drive
 Open folder in Visual Studio Code
