@@ -38,7 +38,7 @@ export default function RecruiterCandidateDetails() {
 
         {/* PROFILE */}
         <section>
-          <h3>👤 Profile</h3>
+          <h3>Profile</h3>
           <p><strong>Name:</strong> {candidate.name}</p>
           <p><strong>Email:</strong> {candidate.email}</p>
           <p><strong>Contact:</strong> {candidate.contactNumber ?? "—"}</p>
@@ -55,7 +55,7 @@ export default function RecruiterCandidateDetails() {
           {candidate.education?.length
             ? <ul>
                 {candidate.education.map((e,i)=>
-                  <li key={i}>{e.degree} from {e.institution} ({e.yearOfCompletion})</li>
+                  <li key={i}>{e.degree} from {e.institution} ({e.yearOfCompletion} years)</li>
                 )}
               </ul>
             : <p>— none listed</p>
@@ -64,7 +64,7 @@ export default function RecruiterCandidateDetails() {
 
         {/* ANSWERS */}
         <section>
-          <h3>📨 Submitted Answers</h3>
+          <h3>Submitted Answers</h3>
           <p><strong>Status:</strong> {response.status}</p>
           <p><strong>Submitted at:</strong> {new Date(response.submitDateTime).toLocaleString()}</p>
           <ol>
@@ -97,15 +97,15 @@ export default function RecruiterCandidateDetails() {
         {analyses.map((a, i) =>
           openAnalysis[i] && (
             <section key={i} className="analysis-section">
-              <h3>🎥 Analysis for Video #{i + 1}</h3>
+              <h3>Analysis for Video #{i + 1}</h3>
 
               {a.error ? (
                 <p style={{ color: "red" }}>Error: {a.error}</p>
               ) : (
                 <>
-                  {/* Sub‑tab 1: Emotion + Fluency */}
+                  {/* Sub‑tab 1: Emotion & Fluency */}
                   <div className="subtab">
-                    <h4>🎭 Emotion + Fluency</h4>
+                    <h4>🎭 Tone Analysis: Emotion & Fluency</h4>
                     {Object.entries(a.emotion_results).map(([model,scores]) => (
                       <Plot
                         key={model}
@@ -117,14 +117,14 @@ export default function RecruiterCandidateDetails() {
                         layout={{ width: 350, height: 300, title: model }}
                       />
                     ))}
-                    <p><strong>Most Likely:</strong> {a.most_likely_emotion}</p>
+                    <p><strong>Most Likely Emotion:</strong> {a.most_likely_emotion}</p>
                     <p><strong>Fluency Level:</strong> {a.fluent_level}</p>
                     <p><strong>Score:</strong> {a.interview_score_tab1.toFixed(2)} / 10.00</p>
                   </div>
 
                   {/* Sub‑tab 2: Personality */}
                   <div className="subtab">
-                    <h4>🧠 Personality Traits</h4>
+                    <h4>🧠 Tone Analysis: Personality Traits</h4>
                     <Plot
                       data={[{
                         type: "scatterpolar",
@@ -152,7 +152,7 @@ export default function RecruiterCandidateDetails() {
 
                   {/* Sub‑tab 3: Text‑Based */}
                   <div className="subtab">
-                    <h4>🗣️ Text‑Based Stress & Emotion</h4>
+                    <h4>🗣️ Text Analysis: Stress & Emotion</h4>
                     <p><strong>Language:</strong> {a.detected_language}</p>
                     <p><strong>Transcript:</strong> {a.transcript}</p>
                     <p><strong>Stress:</strong> {a.stress_detected ? "Yes" : "No"}</p>
@@ -160,9 +160,9 @@ export default function RecruiterCandidateDetails() {
                     <p><strong>Score:</strong> {a.interview_score_tab3.toFixed(2)} / 10.00</p>
                   </div>
 
-                  {/* Sub‑tab 4: Facial + Gaze */}
+                  {/* Sub‑tab 4: Facial & Eye Gaze */}
                   <div className="subtab">
-                    <h4>😶 Facial Expression & Eye Gaze</h4>
+                    <h4>😶 Video Analysis: Facial Expression & Eye Gaze</h4>
 
                     <Plot
                       data={[{
@@ -229,7 +229,7 @@ export default function RecruiterCandidateDetails() {
 
         {/* FINAL SCORE */}
         <section className="analysis-section">
-          <h3>🏆 Overall Final Score</h3>
+          <h3>Overall Final Score</h3>
           <div className="final-score-box">
             {response.marks != null
               ? response.marks.toFixed(2)
