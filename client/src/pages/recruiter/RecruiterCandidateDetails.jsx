@@ -162,7 +162,7 @@ export default function RecruiterCandidateDetails() {
 
                   {/* Sub‑tab 4: Facial & Eye Gaze */}
                   <div className="subtab">
-                    <h4>😶 Video Analysis: Facial Expression & Eye Gaze</h4>
+                    <h4>😶 Frames Analysis: Facial Expression & Eye Gaze</h4>
 
                     <Plot
                       data={[{
