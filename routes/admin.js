@@ -6,6 +6,7 @@ const Candidate = require("../models/candidate");
 const Recruiter = require("../models/Recruiter"); 
 const Admin = require("../models/Admin");
 const router = express.Router();
+const Interview = require("../models/Interview");  
 
 // ✅ Only allow admin users
 router.use(authMiddleware(["admin"]));
@@ -109,8 +110,13 @@ router.post("/delete/:id", async (req, res) => {
       return res.status(403).json({ message: "Cannot delete the main admin account" });
     }
 
-    await User.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: "User deleted successfully" });
+    // If recruiter, delete all interviews created by them
+    if (user.role === "recruiter") {
+      await Interview.deleteMany({ recruiterId: user._id });
+    }
+
+    await User.findByIdAndDelete(user._id);
+    res.status(200).json({ message: "User and associated interviews deleted successfully" });
   } catch (error) {
     console.error("Error deleting user:", error);
     res.status(500).json({ message: "Error deleting user" });

@@ -105,7 +105,7 @@ export default function RecruiterCandidateDetails() {
                 <>
                   {/* Sub‑tab 1: Emotion & Fluency */}
                   <div className="subtab">
-                    <h4>🎭 Tone Analysis: Emotion & Fluency</h4>
+                    <h4>🎭 Audio Analysis: Emotion & Fluency</h4>
                     {Object.entries(a.emotion_results).map(([model,scores]) => (
                       <Plot
                         key={model}
@@ -124,7 +124,7 @@ export default function RecruiterCandidateDetails() {
 
                   {/* Sub‑tab 2: Personality */}
                   <div className="subtab">
-                    <h4>🧠 Tone Analysis: Personality Traits</h4>
+                    <h4>🧠 Audio Analysis: Personality Traits</h4>
                     <Plot
                       data={[{
                         type: "scatterpolar",

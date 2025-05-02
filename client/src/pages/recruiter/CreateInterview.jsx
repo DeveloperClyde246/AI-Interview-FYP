@@ -130,7 +130,7 @@ const CreateInterview = () => {
             />
           </div>
           <div className="form-group">
-            <label>Answer Duration (Minutes):</label>
+            <label>Answer Duration (Seconds):</label>
             <input
               type="number"
               name="answerDuration"

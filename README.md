@@ -62,3 +62,9 @@ Open folder in Visual Studio Code
 pip install -r requirements.txt
 python analysis_api.py
 ```
+
+## To Stop Server:
+1. Use shortcut "Ctrl + C" 
+2. It will show "Terminate batch Job (Y/N)?", type "y" and enter
+3. Make sure to do this before closing Visual Studio Code
+4. If it shows port is being used, u may need to restart your device and run again
