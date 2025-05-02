@@ -325,3 +325,5 @@ if api_url and uploaded_file:
             🌟 Final AI Interview Score: <span style='color:#007ACC'>{data['final_average_score']:.2f} / 10</span>
         </div>
         """, unsafe_allow_html=True)
+
+afdsafsdafsdafsadfsafsdafsdafs
